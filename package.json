@@ -6,9 +6,8 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage --network coverage",
-    "deploy-rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
-    "deploy-local": "npx hardhat run scripts/deploy.ts --network localhost",
-    "deploy-prod": "npx hardhat run scripts/deploy.ts --network mainnet",
+    "rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
+    "prod": "npx hardhat run scripts/deploy.ts --network mainnet",
     "node": "npx hardhat node",
     "test": "npx hardhat test --network hardhat"
   },
