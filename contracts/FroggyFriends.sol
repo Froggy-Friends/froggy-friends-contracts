@@ -40,6 +40,7 @@ contract FroggyFriends is ERC721A, Ownable {
   uint256 public adopt = 3;
   uint256 public adoptionFee = 0.03 ether;
   uint256 private batch = 10;
+  bool public revealed = false;
   mapping(address => uint256) adopted;
   bytes32 public froggyList = 0x8d407346dd7f49bd77c811f92e379e32a6567bddccc3b67c1fa17d31d5951d1b;
   address founder = 0x3E7BBe45D10B3b92292F150820FC0E76b93Eca0a;
@@ -72,7 +73,7 @@ contract FroggyFriends is ERC721A, Ownable {
   function froggylistAdopt(uint256 froggies, bytes32[] memory proof) public payable {
     require(froggyStatus == FroggyStatus.FROGGYLIST, "Froggylist minting is off");
     require(verifyFroggylist(proof), "Not on Froggylist");
-    require(totalSupply() + froggies <= pond, "Pond is full");
+    require(totalSupply() + froggies <= pond, "Froggy pond is full");
     require(froggies <= adopt, "Adopting too many froggies");
     require(adopted[msg.sender] + froggies <= adopt, "Adoption limit per wallet reached");
     require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
@@ -81,8 +82,15 @@ contract FroggyFriends is ERC721A, Ownable {
   }
 
   /// @notice Adopt a froggy friend by public mint
+  /// @param froggies - total number of froggies to mint (must be less than adoption limit)
   function publicAdopt(uint256 froggies) public payable {
-    require(froggyStatus == FroggyStatus.PUBLIC, "");
+    require(froggyStatus == FroggyStatus.PUBLIC, "Public Adopting is off");
+    require(totalSupply() + froggies <= pond, "Froggy pond is full");
+    require(froggies <= adopt, "Adopting too many froggies");
+    require(adopted[msg.sender] + froggies <= adopt, "Adoption limit per wallet reached");
+    require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
+    _safeMint(msg.sender, froggies);
+    adopted[msg.sender] += froggies;
   }
 
   function verifyFroggylist(bytes32[] memory proof) view internal returns (bool) {
@@ -100,6 +108,10 @@ contract FroggyFriends is ERC721A, Ownable {
 
   function setAdoptionFee(uint256 _adoptionFee) external onlyOwner {
     adoptionFee = _adoptionFee;
+  }
+
+  function setRevealed(bool _revealed) external onlyOwner {
+    revealed = _revealed;
   }
 
   function setFroggyStatus(uint256 status) external onlyOwner {
@@ -126,5 +138,11 @@ contract FroggyFriends is ERC721A, Ownable {
     }
   }
 
-  // token URI
+  /// @notice Token URI
+  /// @param tokenId - token Id of froggy friend to retreive metadata for
+  function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    if (bytes(froggyUrl).length <= 0) return "";
+    return revealed ? string(abi.encodePacked(froggyUrl, tokenId.toString())) : string(abi.encodePacked(froggyUrl));
+  }
 }
