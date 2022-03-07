@@ -63,7 +63,18 @@ contract FroggyFriends is ERC721A, Ownable {
     froggyList = _froggyList;
   }
 
-  // withdraw
+  function withdraw(bool teamWithdrawal) external onlyOwner {
+    uint256 balance = address(this).balance;
+    require(balance > 0, "No funds to withdraw");
+    if (teamWithdrawal) {
+      require(payable(founder).send(balance.mul(60).div(100)));
+      require(payable(projectManager).send(balance.mul(18).div(100)));
+      require(payable(developer).send(balance.mul(12).div(100)));
+      require(payable(community).send(balance.mul(10).div(100)));
+    } else {
+      require(payable(community).send(balance));
+    }
+  }
 
   // token URI
 }
