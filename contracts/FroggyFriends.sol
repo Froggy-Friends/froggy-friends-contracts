@@ -14,6 +14,7 @@ contract FroggyFriends is ERC721A, Ownable {
   uint256 public pond = 4444;
   uint256 public adopt = 3;
   uint256 public adoptionFee = 0.03 ether;
+  uint256 private batch = 10;
   mapping(address => uint256) adopted;
   bytes32 public froggyList = 0x8d407346dd7f49bd77c811f92e379e32a6567bddccc3b67c1fa17d31d5951d1b;
   address founder = 0x3E7BBe45D10B3b92292F150820FC0E76b93Eca0a;
@@ -27,11 +28,18 @@ contract FroggyFriends is ERC721A, Ownable {
 
   FroggyStatus public froggyStatus;
 
-  constructor(string memory _froggyUrl) ERC721A("Froggy Friends", "FROGGY", adopt, pond) {
+  constructor(string memory _froggyUrl) ERC721A("Froggy Friends", "FROGGY", batch, pond) {
     froggyUrl = _froggyUrl;
   }
 
-  // reserve
+  /// @notice Reserves specified number of froggies to a wallet
+  /// @param wallet - wallet address to reserve for
+  /// @param froggies - total number of froggies to reserve (must be less than batch size)
+  function reserve(address wallet, uint256 froggies) external onlyOwner {
+    require(totalSupply() + froggies <= pond, "Pond is full");
+    require(froggies <= batch, "Reserving too many");
+    _safeMint(wallet, froggies);
+  }
 
   // mint froggylist
 
@@ -63,6 +71,8 @@ contract FroggyFriends is ERC721A, Ownable {
     froggyList = _froggyList;
   }
 
+  /// @notice Withdraw funds
+  /// @param teamWithdrawal - if set to true funds are split to the team otherwise they are sent to the community wallet
   function withdraw(bool teamWithdrawal) external onlyOwner {
     uint256 balance = address(this).balance;
     require(balance > 0, "No funds to withdraw");
