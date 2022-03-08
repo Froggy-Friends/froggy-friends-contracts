@@ -80,6 +80,7 @@ contract FroggyFriends is ERC721A, Ownable {
     adopted[msg.sender] += froggies;
   }
 
+  /// @dev internal function to verify froggylist membership
   function verifyFroggylist(bytes32[] memory proof) view internal returns (bool) {
     bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
     return MerkleProof.verify(proof, froggyList, leaf);
