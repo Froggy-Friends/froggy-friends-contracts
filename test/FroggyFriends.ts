@@ -132,7 +132,9 @@ describe("Froggy Friends", async () => {
     });
 
     it("insufficient funds", async () => {
-
+      let proof = froggyList.getHexProof(keccak256(acc2.address));
+      const value = parseEther("0.02");
+      await expect(contract.connect(acc2).froggylistAdopt(1, proof, { value: value })).revertedWith("Insufficient funds for adoption");
     });
 
     it("froggylist adopt", async () => {
