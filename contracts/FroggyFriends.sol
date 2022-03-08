@@ -41,7 +41,7 @@ contract FroggyFriends is ERC721A, Ownable {
   uint256 public adoptionFee = 0.03 ether;
   uint256 private batch = 10;
   bool public revealed = false;
-  mapping(address => uint256) adopted;
+  mapping(address => uint256) public adopted;
   bytes32 public froggyList = 0x0;
   address founder = 0x3E7BBe45D10B3b92292F150820FC0E76b93Eca0a;
   address projectManager = 0x818867901f28de9A77117e0756ba12E90B957242;

@@ -53,20 +53,57 @@ describe("Froggy Friends", async () => {
   });
 
   describe("public adopt", async () => {
+    beforeEach(async () => {
+      await contract.setFroggyStatus(2);
+    });
+
     it("public adopting off", async () => {
-    
+      await contract.setFroggyStatus(0);
+      await expect(contract.publicAdopt(1)).revertedWith("Public Adopting is off");
     });
 
     it("adopt limit per wallet", async () => {
-
+      await mint(acc2, 1);
+      await mint(acc2, 1);
+      // verify adopted count
+      expect(await contract.adopted(acc2.address)).equals(2);
+      await expect(contract.publicAdopt(1)).revertedWith("Adoption limit per wallet reached");
     });
 
     it("insufficient funds", async () => {
-
+      const value = parseEther('0.02');
+      await expect(contract.publicAdopt(1, { value: value })).revertedWith("Insufficient funds for adoption");
+      await expect(contract.publicAdopt(2, { value: value })).revertedWith("Insufficient funds for adoption");
     });
 
-    it("pond is full", async () => {
+    it("public adopt", async () => {
+      await mint(acc2, 2);
+      // verify ownership
+      expect(await contract.ownerOf(0)).equals(acc2.address);
+      expect(await contract.ownerOf(1)).equals(acc2.address);
 
+      // verify adopted count
+      expect(await contract.adopted(acc2.address)).equals(2);
+    });
+
+    xit("pond is full", async function () {
+      this.timeout(0);
+      // mint 4,442
+      for (let i = 0; i < 2221; i++) {
+        let account = ethers.Wallet.createRandom().connect(ethers.provider);
+        // owner sends funds to account to pay for claim
+        const gasPrice = await ethers.provider.getGasPrice();
+        const gasLimit = 21000;
+        const eth = parseEther("0.3");
+        await owner.sendTransaction({gasLimit: gasLimit, gasPrice: gasPrice, to: account.address, value: eth});
+        // mint 2 froggies
+        await contract.connect(account).publicAdopt(2, { value: parseEther(adoptionFee).mul(2)});
+      }
+
+      expect(await contract.totalSupply()).equals(4442);
+      await mint(acc2, 2);
+      expect(await contract.totalSupply()).equals(4444);
+      await expect(mint(owner, 2)).revertedWith("Froggy pond is full");
     });
 
   });
@@ -85,6 +122,10 @@ describe("Froggy Friends", async () => {
     });
 
     it("insufficient funds", async () => {
+
+    });
+
+    it("froggylist adopt", async () => {
 
     });
 
