@@ -138,7 +138,11 @@ describe("Froggy Friends", async () => {
     });
 
     it("froggylist adopt", async () => {
-
+      let proof = froggyList.getHexProof(keccak256(acc2.address));
+      await mintFroggylist(acc2, 2, proof);
+      expect(await contract.ownerOf(0)).equals(acc2.address);
+      expect(await contract.ownerOf(1)).equals(acc2.address);
+      expect(await contract.totalSupply()).equals(2);
     });
 
     it("pond is full", async () => {
