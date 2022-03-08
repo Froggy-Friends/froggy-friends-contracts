@@ -136,23 +136,39 @@ describe("Froggy Friends", async () => {
 
   describe("set methods", async () => {
     it("set froggy url", async () => {
-
+      await contract.setFroggyUrl(froggyUrl);
+      expect(await contract.froggyUrl()).equals(froggyUrl);
     });
 
     it("set adopt limit", async () => {
-
+      await contract.setAdoptLimit(10);
+      expect(await contract.adoptLimit()).equals(10);
     });
 
     it("set adoption fee", async () => {
-
+      let newFee = parseEther("0.05");
+      await contract.setAdoptionFee(newFee);
+      expect(await contract.adoptionFee()).equals(newFee);
     });
 
     it("set revealed", async () => {
-
+      await contract.setRevealed(true);
+      expect(await contract.revealed()).equals(true);
     });
 
     it("set froggy status", async () => {
+      await contract.setFroggyStatus(0);
+      expect(await contract.froggyStatus()).equals(0);
+      await contract.setFroggyStatus(1);
+      expect(await contract.froggyStatus()).equals(1);
+      await contract.setFroggyStatus(2);
+      expect(await contract.froggyStatus()).equals(2);
+      await expect(contract.setFroggyStatus(3)).revertedWith("Invalid FroggyStatus");
+    });
 
+    it("set froggylist", async () => {
+      await contract.setFroggyList(froggyList.getHexRoot());
+      expect(await contract.froggyList()).equals(froggyList.getHexRoot());
     });
   });
 
