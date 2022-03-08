@@ -28,7 +28,9 @@
   "homepage": "https://github.com/Froggy-Friends/froggy-friends-contracts#readme",
   "dependencies": {
     "@alch/alchemy-web3": "^1.1.4",
-    "@openzeppelin/contracts": "^4.3.1"
+    "@openzeppelin/contracts": "^4.3.1",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.2.30"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",

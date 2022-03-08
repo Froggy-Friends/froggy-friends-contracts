@@ -42,7 +42,7 @@ contract FroggyFriends is ERC721A, Ownable {
   uint256 private batch = 10;
   bool public revealed = false;
   mapping(address => uint256) adopted;
-  bytes32 public froggyList = 0x8d407346dd7f49bd77c811f92e379e32a6567bddccc3b67c1fa17d31d5951d1b;
+  bytes32 public froggyList = 0x0;
   address founder = 0x3E7BBe45D10B3b92292F150820FC0E76b93Eca0a;
   address projectManager = 0x818867901f28de9A77117e0756ba12E90B957242;
   address developer = 0x1AF8c7140cD8AfCD6e756bf9c68320905C355658;
@@ -58,13 +58,15 @@ contract FroggyFriends is ERC721A, Ownable {
     froggyUrl = _froggyUrl;
   }
 
-  /// @notice Reserves specified number of froggies to a wallet
-  /// @param wallet - wallet address to reserve for
-  /// @param froggies - total number of froggies to reserve (must be less than batch size)
-  function reserve(address wallet, uint256 froggies) external onlyOwner {
-    require(totalSupply() + froggies <= pond, "Pond is full");
-    require(froggies <= batch, "Reserving too many");
-    _safeMint(wallet, froggies);
+  /// @notice Adopt a froggy friend by public mint
+  /// @param froggies - total number of froggies to mint (must be less than adoption limit)
+  function publicAdopt(uint256 froggies) public payable {
+    require(froggyStatus == FroggyStatus.PUBLIC, "Public Adopting is off");
+    require(totalSupply() + froggies <= pond, "Froggy pond is full");
+    require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
+    require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
+    _safeMint(msg.sender, froggies);
+    adopted[msg.sender] += froggies;
   }
 
   /// @notice Adopt a froggy friend from the froggylist
@@ -80,20 +82,18 @@ contract FroggyFriends is ERC721A, Ownable {
     adopted[msg.sender] += froggies;
   }
 
-  /// @notice Adopt a froggy friend by public mint
-  /// @param froggies - total number of froggies to mint (must be less than adoption limit)
-  function publicAdopt(uint256 froggies) public payable {
-    require(froggyStatus == FroggyStatus.PUBLIC, "Public Adopting is off");
-    require(totalSupply() + froggies <= pond, "Froggy pond is full");
-    require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
-    require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
-    _safeMint(msg.sender, froggies);
-    adopted[msg.sender] += froggies;
-  }
-
   function verifyFroggylist(bytes32[] memory proof) view internal returns (bool) {
     bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
     return MerkleProof.verify(proof, froggyList, leaf);
+  }
+
+  /// @notice Reserves specified number of froggies to a wallet
+  /// @param wallet - wallet address to reserve for
+  /// @param froggies - total number of froggies to reserve (must be less than batch size)
+  function reserve(address wallet, uint256 froggies) external onlyOwner {
+    require(totalSupply() + froggies <= pond, "Pond is full");
+    require(froggies <= batch, "Reserving too many");
+    _safeMint(wallet, froggies);
   }
 
   /// @notice Set froggy url
