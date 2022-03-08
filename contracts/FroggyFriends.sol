@@ -37,7 +37,7 @@ contract FroggyFriends is ERC721A, Ownable {
   using Strings for uint256;
   string public froggyUrl;
   uint256 public pond = 4444;
-  uint256 public adopt = 3;
+  uint256 public adoptLimit = 2;
   uint256 public adoptionFee = 0.03 ether;
   uint256 private batch = 10;
   bool public revealed = false;
@@ -74,8 +74,7 @@ contract FroggyFriends is ERC721A, Ownable {
     require(froggyStatus == FroggyStatus.FROGGYLIST, "Froggylist minting is off");
     require(verifyFroggylist(proof), "Not on Froggylist");
     require(totalSupply() + froggies <= pond, "Froggy pond is full");
-    require(froggies <= adopt, "Adopting too many froggies");
-    require(adopted[msg.sender] + froggies <= adopt, "Adoption limit per wallet reached");
+    require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
     require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
     _safeMint(msg.sender, froggies);
     adopted[msg.sender] += froggies;
@@ -86,8 +85,7 @@ contract FroggyFriends is ERC721A, Ownable {
   function publicAdopt(uint256 froggies) public payable {
     require(froggyStatus == FroggyStatus.PUBLIC, "Public Adopting is off");
     require(totalSupply() + froggies <= pond, "Froggy pond is full");
-    require(froggies <= adopt, "Adopting too many froggies");
-    require(adopted[msg.sender] + froggies <= adopt, "Adoption limit per wallet reached");
+    require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
     require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
     _safeMint(msg.sender, froggies);
     adopted[msg.sender] += froggies;
@@ -98,27 +96,39 @@ contract FroggyFriends is ERC721A, Ownable {
     return MerkleProof.verify(proof, froggyList, leaf);
   }
 
+  /// @notice Set froggy url
+  /// @param _froggyUrl new froggy friends base url
   function setFroggyUrl(string memory _froggyUrl) external onlyOwner {
     froggyUrl = _froggyUrl;
   }
 
-  function setAdopt(uint256 _adopt) external onlyOwner {
-    adopt = _adopt;
+  /// @notice Set adopt limit
+  /// @param _adoptLimit new adopt limit per wallet
+  function setAdoptLimit(uint256 _adoptLimit) external onlyOwner {
+    adoptLimit = _adoptLimit;
   }
 
+  /// @notice Set adoption fee
+  /// @param _adoptionFee new adoption fee price in Wei format
   function setAdoptionFee(uint256 _adoptionFee) external onlyOwner {
     adoptionFee = _adoptionFee;
   }
 
+  /// @notice Set revealed
+  /// @param _revealed if set to true metadata is formatted for reveal otherwise metadata is formatted for a preview
   function setRevealed(bool _revealed) external onlyOwner {
     revealed = _revealed;
   }
 
+  /// @notice Set froggy status
+  /// @param status new froggy status can be 0, 1, or 2 for Off, Froggylist and Public mint statuses respectively
   function setFroggyStatus(uint256 status) external onlyOwner {
     require(status <= uint256(FroggyStatus.PUBLIC), "Invalid FroggyStatus");
     froggyStatus = FroggyStatus(status);
   }
 
+  /// @notice Set froggylist
+  /// @param _froggyList new froggylist merkle root
   function setFroggyList(bytes32 _froggyList) external onlyOwner {
     froggyList = _froggyList;
   }
