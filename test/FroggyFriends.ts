@@ -1,5 +1,6 @@
-import { parseEther } from "@ethersproject/units";
+import { formatEther, parseEther } from "@ethersproject/units";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { expect } from "chai";
 import { BytesLike, ContractFactory } from "ethers";
 import { ethers } from "hardhat";
 import keccak256 from "keccak256";
@@ -92,14 +93,64 @@ describe("Froggy Friends", async () => {
   });
 
   describe("set methods", async () => {
+    it("set froggy url", async () => {
 
+    });
+
+    it("set adopt limit", async () => {
+
+    });
+
+    it("set adoption fee", async () => {
+
+    });
+
+    it("set revealed", async () => {
+
+    });
+
+    it("set froggy status", async () => {
+
+    });
   });
 
   describe("withdraw", async () => {
+    it("verify withdraw funds", async () => {
+      await contract.setFroggyStatus(2);
+      for (let i = 0; i < 15; i++) {
+        let account = ethers.Wallet.createRandom().connect(ethers.provider);
+        // owner sends funds to account to pay for claim
+        const gasPrice = await ethers.provider.getGasPrice();
+        const gasLimit = 21000;
+        const eth = parseEther("0.2");
+        await owner.sendTransaction({gasLimit: gasLimit, gasPrice: gasPrice, to: account.address, value: eth});
+        // mint 2 froggies
+        await contract.connect(account).publicAdopt(2, { value: parseEther(adoptionFee).mul(2)});
+      }
+      // smart contract balance 0.9 eth
+      let balance = await contract.provider.getBalance(contract.address);
+      expect(formatEther(balance)).equals("0.9");
 
+      // withdraw to team
+      await contract.withdraw();
+
+      const founderBalance = await contract.provider.getBalance(founder);
+      expect(formatEther(founderBalance)).equals("0.54");
+
+      const projectManagerBalance = await contract.provider.getBalance(projectManager);
+      expect(formatEther(projectManagerBalance)).equals("0.162");
+
+      const developerBalance = await contract.provider.getBalance(developer);
+      expect(formatEther(developerBalance)).equals("0.108");
+
+      const communityBalance = await contract.provider.getBalance(community);
+      expect(formatEther(communityBalance)).equals("0.09");
+    });
   });
 
   describe("token uri", async () => {
+    it("verify token uri", async () => {
 
+    });
   });
 });
