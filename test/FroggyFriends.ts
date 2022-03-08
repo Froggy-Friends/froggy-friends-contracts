@@ -1,7 +1,7 @@
 import { formatEther, parseEther } from "@ethersproject/units";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { BytesLike, ContractFactory } from "ethers";
+import { BytesLike, ContractFactory, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import keccak256 from "keccak256";
 import MerkleTree from "merkletreejs";
@@ -33,14 +33,8 @@ describe("Froggy Friends", async () => {
     await contract.connect(user).froggylistAdopt(froggies, proof, { value: value });
   }
 
-  function hash(account: string) {
-    return Buffer.from(ethers.utils.solidityKeccak256(['uint256'], [account]).slice(2), 'hex');
-  }
-
   before(async () => {
     [owner, acc2, acc3] = await ethers.getSigners();
-    // let froggylist = [owner.address, acc2.address];
-    // froggyList = new MerkleTree(froggylist.map(acc => hash(acc)), keccak256, { sortPairs: true });
     let addresses = [keccak256(owner.address), keccak256(acc2.address)];
     froggyList = new MerkleTree(addresses, keccak256, { sortPairs: true });
   });
@@ -91,7 +85,7 @@ describe("Froggy Friends", async () => {
       // mint 4,442
       for (let i = 0; i < 2221; i++) {
         let account = ethers.Wallet.createRandom().connect(ethers.provider);
-        // owner sends funds to account to pay for claim
+        // owner sends funds to account to pay for mint
         const gasPrice = await ethers.provider.getGasPrice();
         const gasLimit = 21000;
         const eth = parseEther("0.3");
@@ -116,12 +110,12 @@ describe("Froggy Friends", async () => {
 
     it("froggylist adopting off", async () => {
       await contract.setFroggyStatus(0);
-      let proof = froggyList.getHexProof(hash(owner.address));
+      let proof = froggyList.getHexProof(keccak256(owner.address));
       await expect(contract.froggylistAdopt(1, proof)).revertedWith("Froggylist adopting is off");
     });
 
     it("not on froggylist", async () => {
-      let proof = froggyList.getHexProof(hash(acc3.address));
+      let proof = froggyList.getHexProof(keccak256(acc3.address));
       await expect(contract.connect(acc3).froggylistAdopt(2, proof)).revertedWith("Not on Froggylist");
     });
 
@@ -142,11 +136,42 @@ describe("Froggy Friends", async () => {
       await mintFroggylist(acc2, 2, proof);
       expect(await contract.ownerOf(0)).equals(acc2.address);
       expect(await contract.ownerOf(1)).equals(acc2.address);
+      expect(await contract.adopted(acc2.address)).equals(2);
       expect(await contract.totalSupply()).equals(2);
     });
 
-    it("pond is full", async () => {
+    xit("pond is full", async function() {
+      this.timeout(0);
+      
+      let addresses: any[] = [];
+      for (let i = 0; i < 2222; i++) {
+        let account = Wallet.createRandom().connect(ethers.provider);
+        // owner sends funds to account to pay for mint
+        const gasPrice = await ethers.provider.getGasPrice();
+        const gasLimit = 21000;
+        const eth = parseEther("0.3");
+        await owner.sendTransaction({gasLimit: gasLimit, gasPrice: gasPrice, to: account.address, value: eth});
+        addresses.push(account);
+      }
 
+      // create new merkle tree with 2,222 accounts
+      addresses.push(acc2);
+      froggyList = new MerkleTree(addresses.map(wallet => keccak256(wallet.address)), keccak256, { sortPairs: true });
+      // whitelist 2,222 accounts
+      await contract.setFroggyList(froggyList.getHexRoot());
+
+      // mint 4,444 froggies
+      let counter = 0;
+      for (const wallet of addresses.slice(0, addresses.length -1)) {
+        let proof = froggyList.getHexProof(keccak256(wallet.address));
+        const value = parseEther(adoptionFee).mul(2);
+        await contract.connect(wallet).froggylistAdopt(2, proof, { value: value });
+        counter++;
+      }
+
+      expect(await contract.totalSupply()).equals(4444);
+      let proof = froggyList.getHexProof(keccak256(acc2.address));
+      await expect(mintFroggylist(acc2, 1, proof)).revertedWith("Froggy pond is full");
     });
   });
 
@@ -193,7 +218,7 @@ describe("Froggy Friends", async () => {
       await contract.setFroggyStatus(2);
       for (let i = 0; i < 15; i++) {
         let account = ethers.Wallet.createRandom().connect(ethers.provider);
-        // owner sends funds to account to pay for claim
+        // owner sends funds to account to pay for mint
         const gasPrice = await ethers.provider.getGasPrice();
         const gasLimit = 21000;
         const eth = parseEther("0.2");
