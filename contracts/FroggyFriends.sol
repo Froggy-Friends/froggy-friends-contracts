@@ -54,9 +54,7 @@ contract FroggyFriends is ERC721A, Ownable {
 
   FroggyStatus public froggyStatus;
 
-  constructor(string memory _froggyUrl) ERC721A("Froggy Friends", "FROGGY", batch, pond) {
-    froggyUrl = _froggyUrl;
-  }
+  constructor() ERC721A("Froggy Friends", "FROGGY", batch, pond) {}
 
   /// @notice Adopt a froggy friend by public mint
   /// @param froggies - total number of froggies to mint (must be less than adoption limit)

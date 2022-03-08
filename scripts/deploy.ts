@@ -1,8 +1,5 @@
-import { ethers, run, network } from "hardhat";
+import { ethers, run } from "hardhat";
 
-interface ContractParams {
-    baseUrl: string;
-}
 
 function sleep(ms: number) {
     return new Promise(resolve => {
@@ -16,8 +13,7 @@ async function main() {
     const [owner] = await ethers.getSigners();
     console.log("\nDeployment Owner: ", owner.address);
 
-    const { baseUrl } = getContractParams(network.name);
-    const contract = (await factory.deploy(baseUrl));
+    const contract = (await factory.deploy());
     console.log("\nContract Address: ", contract.address);
     
     await contract.deployed();
@@ -32,21 +28,9 @@ async function main() {
     await run("verify:verify", 
         { 
             address: contract.address,
-            constructorArguments: [baseUrl]
+            constructorArguments: []
         }
     );
-}
-
-function getContractParams(network: string): ContractParams {
-    if (network == "mainnet") {
-        return {
-            baseUrl: ""
-        }
-    } else {
-        return {
-            baseUrl: ""
-        }
-    }
 }
 
 main()

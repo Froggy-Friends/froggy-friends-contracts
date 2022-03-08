@@ -16,7 +16,8 @@ describe("Froggy Friends", async () => {
   let acc3: SignerWithAddress;
   let pond = 4444;;
   let adopt = 2;
-  let froggyUrl = "https://api.froggyfriendsmint.com";
+  let froggyPreviewUrl = "https://api.froggyfriendsmint.com/preview";
+  let froggyUrl = "https://api.froggyfriendsmint.com/";
   let adoptionFee = "0.03";
   let froggyList: MerkleTree;
   const founder = "0x3E7BBe45D10B3b92292F150820FC0E76b93Eca0a";
@@ -47,7 +48,7 @@ describe("Froggy Friends", async () => {
   beforeEach(async () => {
     [owner, acc2, acc3] = await ethers.getSigners();
     factory = await ethers.getContractFactory("FroggyFriends");
-    contract = (await factory.deploy(froggyUrl)) as FroggyFriends;
+    contract = (await factory.deploy()) as FroggyFriends;
     await contract.deployed();
   });
 
@@ -149,8 +150,29 @@ describe("Froggy Friends", async () => {
   });
 
   describe("token uri", async () => {
-    it("verify token uri", async () => {
+    beforeEach(async () => {
+      await contract.setFroggyStatus(2);
+    });
 
+    it("no base url", async () => {
+      await mint(acc2, 2);
+      const tokenUri = await contract.tokenURI(0);
+      expect(tokenUri).equals("");
+    });
+
+    it("pre reveal", async () => {
+      await mint(acc2, 2);
+      await contract.setFroggyUrl(froggyPreviewUrl);
+      const tokenUri = await contract.tokenURI(0);
+      expect(tokenUri).equals(froggyPreviewUrl);
+    });
+
+    it("post reveal", async () => {
+      await mint(acc2, 2);
+      await contract.setFroggyUrl(froggyUrl);
+      await contract.setRevealed(true);
+      const tokenUri = await contract.tokenURI(0);
+      expect(tokenUri).equals(`${froggyUrl}0`);
     });
   });
 });
