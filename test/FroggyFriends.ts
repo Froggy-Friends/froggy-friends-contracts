@@ -14,8 +14,6 @@ describe("Froggy Friends", async () => {
   let owner: SignerWithAddress;
   let acc2: SignerWithAddress;
   let acc3: SignerWithAddress;
-  let pond = 4444;;
-  let adopt = 2;
   let froggyPreviewUrl = "https://api.froggyfriendsmint.com/preview";
   let froggyUrl = "https://api.froggyfriendsmint.com/";
   let adoptionFee = "0.03";
@@ -41,8 +39,10 @@ describe("Froggy Friends", async () => {
 
   before(async () => {
     [owner, acc2, acc3] = await ethers.getSigners();
-    let froggylist = [owner.address, acc2.address];
-    froggyList = new MerkleTree(froggylist.map(acc => hash(acc)), keccak256, { sortPairs: true });
+    // let froggylist = [owner.address, acc2.address];
+    // froggyList = new MerkleTree(froggylist.map(acc => hash(acc)), keccak256, { sortPairs: true });
+    let addresses = [keccak256(owner.address), keccak256(acc2.address)];
+    froggyList = new MerkleTree(addresses, keccak256, { sortPairs: true });
   });
 
   beforeEach(async () => {
@@ -59,7 +59,7 @@ describe("Froggy Friends", async () => {
 
     it("public adopting off", async () => {
       await contract.setFroggyStatus(0);
-      await expect(contract.publicAdopt(1)).revertedWith("Public Adopting is off");
+      await expect(contract.publicAdopt(1)).revertedWith("Public adopting is off");
     });
 
     it("adopt limit per wallet", async () => {
@@ -109,16 +109,26 @@ describe("Froggy Friends", async () => {
   });
 
   describe("froggylist adopt", async () => {
+    beforeEach(async () => {
+      await contract.setFroggyList(froggyList.getHexRoot());
+      await contract.setFroggyStatus(1);
+    });
+
     it("froggylist adopting off", async () => {
-    
+      await contract.setFroggyStatus(0);
+      let proof = froggyList.getHexProof(hash(owner.address));
+      await expect(contract.froggylistAdopt(1, proof)).revertedWith("Froggylist adopting is off");
     });
 
     it("not on froggylist", async () => {
-
+      let proof = froggyList.getHexProof(hash(acc3.address));
+      await expect(contract.connect(acc3).froggylistAdopt(2, proof)).revertedWith("Not on Froggylist");
     });
 
     it("adopt limit per wallet", async () => {
-
+      let proof = froggyList.getHexProof(keccak256(acc2.address));
+      await mintFroggylist(acc2, 2, proof);
+      await expect(mintFroggylist(acc2, 1, proof)).revertedWith("Adoption limit per wallet reached");
     });
 
     it("insufficient funds", async () => {

@@ -59,7 +59,7 @@ contract FroggyFriends is ERC721A, Ownable {
   /// @notice Adopt a froggy friend by public mint
   /// @param froggies - total number of froggies to mint (must be less than adoption limit)
   function publicAdopt(uint256 froggies) public payable {
-    require(froggyStatus == FroggyStatus.PUBLIC, "Public Adopting is off");
+    require(froggyStatus == FroggyStatus.PUBLIC, "Public adopting is off");
     require(totalSupply() + froggies <= pond, "Froggy pond is full");
     require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
     require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
@@ -71,7 +71,7 @@ contract FroggyFriends is ERC721A, Ownable {
   /// @param froggies - total number of froggies to mint (must be less than adoption limit)
   /// @param proof - proof that minting wallet is on froggylist
   function froggylistAdopt(uint256 froggies, bytes32[] memory proof) public payable {
-    require(froggyStatus == FroggyStatus.FROGGYLIST, "Froggylist minting is off");
+    require(froggyStatus == FroggyStatus.FROGGYLIST, "Froggylist adopting is off");
     require(verifyFroggylist(proof), "Not on Froggylist");
     require(totalSupply() + froggies <= pond, "Froggy pond is full");
     require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
