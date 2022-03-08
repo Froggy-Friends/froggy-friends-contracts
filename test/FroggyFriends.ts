@@ -1,11 +1,11 @@
 import { formatEther, parseEther } from "@ethersproject/units";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { BytesLike, ContractFactory, Wallet } from "ethers";
+import { BytesLike, ContractFactory, Wallet, utils } from "ethers";
 import { ethers } from "hardhat";
-import keccak256 from "keccak256";
 import MerkleTree from "merkletreejs";
 import { FroggyFriends } from './../types/FroggyFriends';
+const { keccak256 } = utils;
 
 
 describe("Froggy Friends", async () => {
