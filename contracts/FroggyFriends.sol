@@ -72,7 +72,7 @@ contract FroggyFriends is ERC721A, Ownable {
   /// @param proof - proof that minting wallet is on froggylist
   function froggylistAdopt(uint256 froggies, bytes32[] memory proof) public payable {
     require(froggyStatus == FroggyStatus.FROGGYLIST, "Froggylist adopting is off");
-    require(verifyFroggylist(proof), "Not on Froggylist");
+    require(verifyFroggylist(msg.sender, proof), "Not on Froggylist");
     require(totalSupply() + froggies <= pond, "Froggy pond is full");
     require(adopted[msg.sender] + froggies <= adoptLimit, "Adoption limit per wallet reached");
     require(msg.value >= adoptionFee * froggies, "Insufficient funds for adoption");
@@ -81,9 +81,15 @@ contract FroggyFriends is ERC721A, Ownable {
   }
 
   /// @dev internal function to verify froggylist membership
-  function verifyFroggylist(bytes32[] memory proof) view internal returns (bool) {
-    bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+  function verifyFroggylist(address wallet, bytes32[] memory proof) view internal returns (bool) {
+    bytes32 leaf = keccak256(abi.encodePacked(wallet));
     return MerkleProof.verify(proof, froggyList, leaf);
+  }
+
+  /// @notice Check if wallet is on froggylist
+  /// @param proof - proof that wallet is on froggylist
+  function isOnFroggylist(address wallet, bytes32[] memory proof) external view returns (bool) {
+    return verifyFroggylist(wallet, proof);
   }
 
   /// @notice Reserves specified number of froggies to a wallet

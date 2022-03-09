@@ -175,6 +175,24 @@ describe("Froggy Friends", async () => {
     });
   });
 
+  describe("Is on froggylist", async () => {
+    beforeEach(async () => {
+      await contract.setFroggyList(froggyList.getHexRoot());
+    });
+
+    it("is on froggylist", async () => {
+      let proof = froggyList.getHexProof(keccak256(acc2.address));
+      const isOnFroggylist = await contract.isOnFroggylist(acc2.address, proof);
+      expect(isOnFroggylist);
+    });
+
+    it("is not on froggylist", async () => {
+      let proof = froggyList.getHexProof(keccak256(acc3.address));
+      const isOnFroggylist = await contract.isOnFroggylist(acc3.address, proof);
+      expect(isOnFroggylist).false;
+    });
+  });
+
   describe("set methods", async () => {
     it("set froggy url", async () => {
       await contract.setFroggyUrl(froggyUrl);
