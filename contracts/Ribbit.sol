@@ -33,10 +33,15 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Ribbit is ERC20, ERC20Burnable, Ownable {
+
+    /// @dev set $RIBBIT supply to 444,444,444
     constructor() ERC20("Ribbit", "RIBBIT") {
-        _mint(msg.sender, 1000000000 * 10 ** decimals());
+        _mint(msg.sender, 444444444 * 10 ** decimals());
     }
 
+    /// @notice Mints amount of tokens 
+    /// @param to - address to mint tokens to
+    /// @param amount - total amount of tokens to mint
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
