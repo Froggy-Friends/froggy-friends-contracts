@@ -9,6 +9,7 @@
     "rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
     "prod": "npx hardhat run scripts/deploy.ts --network mainnet",
     "node": "npx hardhat node",
+    "rarity": "npx hardhat run scripts/rarity.ts",
     "test": "npx hardhat test --network hardhat",
     "snapshot": "npx hardhat run scripts/snapshot.ts --network mainnet"
   },
