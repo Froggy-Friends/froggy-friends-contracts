@@ -1,8 +1,7 @@
-import { ethers, run } from "hardhat";
+import { ethers, run, network } from "hardhat";
 
 interface ContractParams {
-  name: string;
-  symbol: string;
+  froggyAddress: string;
 }
 
 function sleep(ms: number) {
@@ -13,12 +12,12 @@ function sleep(ms: number) {
 
 async function main() {
     console.log("Starting deployment...");
-    const factory = await ethers.getContractFactory("Ribbit");
+    const factory = await ethers.getContractFactory("StakeFroggies");
     const [owner] = await ethers.getSigners();
     console.log("\nDeployment Owner: ", owner.address);
 
-    const { name, symbol } = getContractParams();
-    const contract = (await factory.deploy(name, symbol));
+    const { froggyAddress } = getContractParams(network.name);
+    const contract = (await factory.deploy(froggyAddress));
     console.log("\nContract Address: ", contract.address);
     
     await contract.deployed();
@@ -33,15 +32,20 @@ async function main() {
     await run("verify:verify", 
         { 
             address: contract.address,
-            constructorArguments: [name, symbol]
+            constructorArguments: [froggyAddress]
         }
     );
 }
 
-function getContractParams(): ContractParams {
-  return {
-    name: "RIBBIT",
-    symbol: "RIBBIT"
+function getContractParams(network: string): ContractParams {
+  if (network == "mainnet") {
+      return {
+          froggyAddress: "",
+      }
+  } else {
+      return {
+          froggyAddress: "0xF47E8A340672Dacb10Da0f677632a694a96E9CD0"
+      }
   }
 }
 
