@@ -147,7 +147,7 @@ describe("Testing froggy staking contract ", async function () {
     const leaf3 = keccak256("740")
     const proof3 = tree.getProof(leaf3).map(x=>'0x'+ x.data.toString('hex'))
     await  stakingfroggy_.connect(signer1).stake([4,5,7],[ proof1 , proof2, proof3])
-    const Tx=await  stakingfroggy_.connect(signer1).checkallnftstaked()
+    const Tx=await  stakingfroggy_.connect(signer1).checkallnftstaked(signer1.address)
      console.log(Tx[0].toString())
     expect(Number(Tx[0].toString())).to.equal(4);
     expect(Number(Tx[1].toString())).to.equal(5);
@@ -164,9 +164,9 @@ describe("Testing froggy staking contract ", async function () {
     const leaf3 = keccak256("740")
     const proof3 = tree.getProof(leaf3).map(x=>'0x'+ x.data.toString('hex'))
     await  stakingfroggy_.connect(signer1).stake([4,5,7],[ proof1 , proof2, proof3])
-    const Tx=await  stakingfroggy_.connect(signer1).checkallnftstaked()  
+    const Tx=await  stakingfroggy_.connect(signer1).checkallnftstaked(signer1.address)
     await  stakingfroggy_.connect(signer1).unstake([4,5,7])
-    const Tx2=await  stakingfroggy_.connect(signer1).checkallnftstaked()
+    const Tx2=await  stakingfroggy_.connect(signer1).checkallnftstaked(signer1.address)
     console.log("check checkallnftstaked after unstake", Tx2)
     expect(Tx2[0]).to.equal();
     expect(Tx2[1]).to.equal();
