@@ -138,6 +138,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function claimreward() public {
+        require(allnftstakeforaddress[msg.sender].length > 0, "No froggies staked");
         uint256[] memory tokenIds = new uint256[](
             allnftstakeforaddress[msg.sender].length
         );
@@ -196,8 +197,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         return rewardbal;
     }
 
-    function checkallnftstaked() public view returns (uint256[] memory) {
-        return allnftstakeforaddress[msg.sender];
+    function checkallnftstaked(address account) public view returns (uint256[] memory) {
+        return allnftstakeforaddress[account];
     }
 
     function withdrawerc20(address erc20addd, address _to) public onlyOwner {
