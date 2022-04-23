@@ -95,7 +95,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function setapprovedcontractaddressforburn(address add) external onlyOwner {
-        onlyapprovedcontractaddressforburn[msg.sender] = true;
+        onlyapprovedcontractaddressforburn[add] = true;
     }
 
     function removeapprovedcontractaddressforburn(address add)
