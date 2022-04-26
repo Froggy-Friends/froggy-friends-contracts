@@ -173,23 +173,25 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
             return reward;
         }
+
+        return 0;
     }
 
-    function checkrewardbalforall() public view returns (uint256) {
+    function checkrewardbalforall(address account) public view returns (uint256) {
         uint256[] memory tokenIds = new uint256[](
-            allnftstakeforaddress[msg.sender].length
+            allnftstakeforaddress[account].length
         );
-        tokenIds = allnftstakeforaddress[msg.sender];
+        tokenIds = allnftstakeforaddress[account];
 
         uint256 current;
         uint256 reward;
         uint256 rewardbal;
         for (uint256 i; i < tokenIds.length; i++) {
-            if (idtostartingtimet[tokenIds[i]][msg.sender] > 0) {
+            if (idtostartingtimet[tokenIds[i]][account] > 0) {
                 uint256 rate = idtokenrate[tokenIds[i]];
                 current =
                     block.timestamp -
-                    idtostartingtimet[tokenIds[i]][msg.sender];
+                    idtostartingtimet[tokenIds[i]][account];
                 reward = ((rate * 10**18) * current) / 86400;
                 rewardbal += reward;
             }

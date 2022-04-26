@@ -222,8 +222,8 @@ describe("Testing froggy staking contract ", async function () {
     let timestampBefore= blockBefore.timestamp;
     await ethers.provider.send('evm_setNextBlockTimestamp', [ timestampBefore+oneday]);
     await ethers.provider.send('evm_mine');
-    expect(await stakingfroggy_.connect(signer1).checkrewardbalforall()).to.equal("90000000000000000000")
-    console.log(await stakingfroggy_.connect(signer1).checkrewardbalforall())
+    expect(await stakingfroggy_.connect(signer1).checkrewardbalforall(signer1.address)).to.equal("90000000000000000000")
+    console.log(await stakingfroggy_.connect(signer1).checkrewardbalforall(signer1.address))
     await  stakingfroggy_.connect(signer1).unstake([3,6,8])
    
     expect(await stakingfroggy_.connect(signer1).checkrewardbal(3)).to.equal("0")
