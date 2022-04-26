@@ -174,7 +174,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             return reward;
         }
 
-        return 0;
+        return reward;
     }
 
     function checkrewardbalforall(address account) public view returns (uint256) {
