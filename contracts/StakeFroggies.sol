@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -73,6 +74,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 return rewardtier[i];
             }
         }
+
+        return 0;
     }
 
     function setstakingstate() public onlyOwner {
