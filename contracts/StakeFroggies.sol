@@ -263,7 +263,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         return rewardbal;
     }
 
-    function getFroggiesStaked(address account) public view returns (uint256[] memory) {
+    function deposits(address account) public view returns (uint256[] memory) {
         return froggiesStaked[account];
     }
 
