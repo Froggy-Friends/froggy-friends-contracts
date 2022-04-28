@@ -40,7 +40,7 @@ async function main() {
 
 function getContractParams(): ContractParams {
   return {
-    name: "RIBBIT",
+    name: "Ribbit",
     symbol: "RIBBIT"
   }
 }
