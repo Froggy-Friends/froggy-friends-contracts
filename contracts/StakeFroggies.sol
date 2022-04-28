@@ -45,7 +45,7 @@ interface IRibbit {
     function mint(address add, uint256 amount) external;
 }
 
-interface Ierc20 {
+interface IErc20 {
     function transfer(address to, uint256 amount) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
 }
@@ -61,7 +61,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     using Strings for uint256;
     IFroggyFriends froggyFriends;
     IRibbit ribbit;
-    Ierc20 ierc20;
+    IErc20 ierc20;
     IRibbitItem ribbitItem;
     bool public started = true;
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
@@ -268,7 +268,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function withdrawerc20(address erc20addd, address _to) public onlyOwner {
-        ierc20 = Ierc20(erc20addd);
+        ierc20 = IErc20(erc20addd);
         ierc20.transfer(_to, ierc20.balanceOf(address(this)));
     }
 
