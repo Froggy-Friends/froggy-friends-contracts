@@ -6,11 +6,14 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage --network coverage",
+    "deploy-ribbit": "npx hardhat run scripts/deploy-ribbit.ts --network rinkeby",
+    "deploy-staking": "npx hardhat run scripts/deploy-staking.ts --network rinkeby",
     "rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
     "prod": "npx hardhat run scripts/deploy.ts --network mainnet",
     "node": "npx hardhat node",
     "rarity": "npx hardhat run scripts/rarity.ts",
     "test": "npx hardhat test --network hardhat",
+    "test-staking": "npx hardhat test test/staking.js --network hardhat",
     "snapshot": "npx hardhat run scripts/snapshot.ts --network mainnet"
   },
   "repository": {
