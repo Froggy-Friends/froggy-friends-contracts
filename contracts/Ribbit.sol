@@ -18,7 +18,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
 
     string private _name;
     string private _symbol;
-    uint256 supplycapamount = 444444444 * 10**18;
+    uint256 supplycapamount = 500000000 * 10**18;
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
