@@ -41,7 +41,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
 
     mapping(address => mapping(address => uint256)) private _allowances;
     mapping(address => bool) onlyApprovedContractAddress;
-    mapping(address => bool) onlyapprovedcontractaddressforburn;
+    mapping(address => bool) onlyApprovedContractAddressForBurn;
 
     uint256 private _totalSupply;
 
@@ -104,15 +104,15 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function setapprovedcontractaddressforburn(address add) external onlyOwner {
-        onlyapprovedcontractaddressforburn[add] = true;
+        onlyApprovedContractAddressForBurn[add] = true;
     }
 
     function removeapprovedcontractaddressforburn(address add) external onlyOwner {
-        onlyapprovedcontractaddressforburn[add] = false;
+        onlyApprovedContractAddressForBurn[add] = false;
     }
 
     function burn(address add, uint256 amount) public {
-        require(onlyapprovedcontractaddressforburn[msg.sender] == true, "you are not approved  to burn");
+        require(onlyApprovedContractAddressForBurn[msg.sender] == true, "you are not approved  to burn");
         _burn(add, amount);
     }
 
