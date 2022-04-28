@@ -40,7 +40,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
-    mapping(address => bool) onlyapprovedcontractaddress;
+    mapping(address => bool) onlyApprovedContractAddress;
     mapping(address => bool) onlyapprovedcontractaddressforburn;
 
     uint256 private _totalSupply;
@@ -81,15 +81,15 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function setapprovedcontractaddress(address add) external onlyOwner {
-        onlyapprovedcontractaddress[add] = true;
+        onlyApprovedContractAddress[add] = true;
     }
 
     function removeapprovedcontractaddress(address add) external onlyOwner {
-        onlyapprovedcontractaddress[add] = false;
+        onlyApprovedContractAddress[add] = false;
     }
 
     function mint(address add, uint256 amount) external {
-        require(onlyapprovedcontractaddress[msg.sender] == true, "you are not approved  to mint");
+        require(onlyApprovedContractAddress[msg.sender] == true, "you are not approved  to mint");
         require(totalSupply() + amount <= supplycapamount, "mint has exeeeded supplycap");
         _mint(add, amount);
     }
