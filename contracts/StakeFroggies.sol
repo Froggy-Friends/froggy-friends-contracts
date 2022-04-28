@@ -52,8 +52,8 @@ interface IERC20 {
 interface IRibbitItem {
     function burn(address from, uint256 id, uint256 amount) external;
     function balanceOf(address account, uint256 id) external view returns (uint256);
-    function checkifboostid(uint256 id) external view returns (bool);
-    function checkpercentage(uint256 id) external view returns (uint256);
+    function isBoost(uint256 id) external view returns (bool);
+    function boostPercentage(uint256 id) external view returns (uint256);
 }
 
 contract StakeFroggies is IERC721Receiver, Ownable {
@@ -205,7 +205,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "you dont have an erc1155 item"
         );
         require(
-            _ribbitItem.checkifboostid(boostingid) == true,
+            _ribbitItem.isBoost(boostingid) == true,
             "not a boosting item"
         );
         require(
@@ -222,7 +222,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         idTokenRateBoosted[tokenIds] =
             _idtokenrate *
             1000 +
-            (_ribbitItem.checkpercentage(boostingid) *
+            (_ribbitItem.boostPercentage(boostingid) *
                 _idtokenrate *
                 1000) /
             100;
