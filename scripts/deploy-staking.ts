@@ -40,7 +40,7 @@ async function main() {
 function getContractParams(network: string): ContractParams {
   if (network == "mainnet") {
       return {
-          froggyAddress: "",
+          froggyAddress: "0x29652C2e9D3656434Bc8133c69258C8d05290f41",
       }
   } else {
       return {
