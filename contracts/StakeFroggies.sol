@@ -108,14 +108,14 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         }
     }
 
-    function unStake(uint256[] memory tokenIds) external {
-        uint256[] memory _tokenIds = new uint256[](tokenIds.length);
-        _tokenIds = tokenIds;
-        for (uint256 i; i < _tokenIds.length; i++) {
-            require(idToStaker[_tokenIds[i]] == msg.sender, "Not your Froggy Friend");
-            froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
+    function unStake(uint256[] memory froggyIds) external {
+        uint256[] memory _froggyIds = new uint256[](froggyIds.length);
+        _froggyIds = froggyIds;
+        for (uint256 i; i < _froggyIds.length; i++) {
+            require(idToStaker[_froggyIds[i]] == msg.sender, "Not your Froggy Friend");
+            froggyFriends.transferFrom(address(this), msg.sender, _froggyIds[i]);
             for (uint256 j; j < froggiesStaked[msg.sender].length; j++) {
-                if (froggiesStaked[msg.sender][j] == _tokenIds[i]) {
+                if (froggiesStaked[msg.sender][j] == _froggyIds[i]) {
                     froggiesStaked[msg.sender][j] = froggiesStaked[msg.sender][froggiesStaked[msg.sender].length - 1];
                     froggiesStaked[msg.sender].pop();
                     break;
@@ -124,22 +124,22 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
             uint256 current;
             uint256 reward;
-            delete idToStaker[_tokenIds[i]];
-            if (idToStartingTime[_tokenIds[i]][msg.sender] > 0) {
-                if (boosted[_tokenIds[i]] == false) {
-                    uint256 rate = idTokenRate[_tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[_tokenIds[i]][msg.sender];
+            delete idToStaker[_froggyIds[i]];
+            if (idToStartingTime[_froggyIds[i]][msg.sender] > 0) {
+                if (boosted[_froggyIds[i]] == false) {
+                    uint256 rate = idTokenRate[_froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[_froggyIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
                     ribbit.mint(msg.sender, reward);
-                    idToStartingTime[_tokenIds[i]][msg.sender] = 0;
+                    idToStartingTime[_froggyIds[i]][msg.sender] = 0;
                 }
 
-                if (boosted[_tokenIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[_tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[_tokenIds[i]][msg.sender];
+                if (boosted[_froggyIds[i]] == true) {
+                    uint256 rate = idTokenRateBoosted[_froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[_froggyIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     ribbit.mint(msg.sender, reward);
-                    idToStartingTime[_tokenIds[i]][msg.sender] = 0;
+                    idToStartingTime[_froggyIds[i]][msg.sender] = 0;
                 }
             }
         }
@@ -184,28 +184,28 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
     function claim() public {
         require(froggiesStaked[msg.sender].length > 0, "No froggies staked");
-        uint256[] memory tokenIds = new uint256[](froggiesStaked[msg.sender].length);
-        tokenIds = froggiesStaked[msg.sender];
+        uint256[] memory froggyIds = new uint256[](froggiesStaked[msg.sender].length);
+        froggyIds = froggiesStaked[msg.sender];
 
         uint256 current;
         uint256 reward;
         uint256 rewardbal;
-        for (uint256 i; i < tokenIds.length; i++) {
-            if (idToStartingTime[tokenIds[i]][msg.sender] > 0) {
-                if (boosted[tokenIds[i]] == false) {
-                    uint256 rate = idTokenRate[tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[tokenIds[i]][msg.sender];
+        for (uint256 i; i < froggyIds.length; i++) {
+            if (idToStartingTime[froggyIds[i]][msg.sender] > 0) {
+                if (boosted[froggyIds[i]] == false) {
+                    uint256 rate = idTokenRate[froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[froggyIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
                     rewardbal += reward;
-                    idToStartingTime[tokenIds[i]][msg.sender] = block.timestamp;
+                    idToStartingTime[froggyIds[i]][msg.sender] = block.timestamp;
                 }
 
-                if (boosted[tokenIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[tokenIds[i]][msg.sender];
+                if (boosted[froggyIds[i]] == true) {
+                    uint256 rate = idTokenRateBoosted[froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[froggyIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
-                    idToStartingTime[tokenIds[i]][msg.sender] = block.timestamp;
+                    idToStartingTime[froggyIds[i]][msg.sender] = block.timestamp;
                 }
             }
         }
@@ -213,20 +213,20 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         ribbit.mint(msg.sender, rewardbal);
     }
 
-    function balance(uint256 tokenId) public view returns (uint256) {
+    function balance(uint256 froggyId) public view returns (uint256) {
         uint256 current;
         uint256 reward;
 
-        if (idToStartingTime[tokenId][msg.sender] > 0) {
-            if (boosted[tokenId] == false) {
-                uint256 rate = idTokenRate[tokenId];
-                current = block.timestamp - idToStartingTime[tokenId][msg.sender];
+        if (idToStartingTime[froggyId][msg.sender] > 0) {
+            if (boosted[froggyId] == false) {
+                uint256 rate = idTokenRate[froggyId];
+                current = block.timestamp - idToStartingTime[froggyId][msg.sender];
                 reward = ((rate * 10**18) * current) / 86400;
             }
 
-            if (boosted[tokenId] == true) {
-                uint256 rate = idTokenRateBoosted[tokenId];
-                current = block.timestamp - idToStartingTime[tokenId][msg.sender];
+            if (boosted[froggyId] == true) {
+                uint256 rate = idTokenRateBoosted[froggyId];
+                current = block.timestamp - idToStartingTime[froggyId][msg.sender];
                 reward = (((rate * 10**18) / 1000) * current) / 86400;
             }
 
@@ -237,24 +237,24 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function balanceOf(address account) public view returns (uint256) {
-        uint256[] memory tokenIds = new uint256[](froggiesStaked[account].length);
-        tokenIds = froggiesStaked[account];
+        uint256[] memory froggyIds = new uint256[](froggiesStaked[account].length);
+        froggyIds = froggiesStaked[account];
 
         uint256 current;
         uint256 reward;
         uint256 rewardbal;
-        for (uint256 i; i < tokenIds.length; i++) {
-            if (idToStartingTime[tokenIds[i]][account] > 0) {
-                if (boosted[tokenIds[i]] == false) {
-                    uint256 rate = idTokenRate[tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[tokenIds[i]][account];
+        for (uint256 i; i < froggyIds.length; i++) {
+            if (idToStartingTime[froggyIds[i]][account] > 0) {
+                if (boosted[froggyIds[i]] == false) {
+                    uint256 rate = idTokenRate[froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[froggyIds[i]][account];
                     reward = ((rate * 10**18) * current) / 86400;
                     rewardbal += reward;
                 }
 
-                if (boosted[tokenIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[tokenIds[i]];
-                    current = block.timestamp - idToStartingTime[tokenIds[i]][account];
+                if (boosted[froggyIds[i]] == true) {
+                    uint256 rate = idTokenRateBoosted[froggyIds[i]];
+                    current = block.timestamp - idToStartingTime[froggyIds[i]][account];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
                 }
