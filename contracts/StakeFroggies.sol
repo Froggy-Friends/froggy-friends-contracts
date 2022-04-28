@@ -67,7 +67,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     bool public started = true;
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
     uint256[] public rewardtier = [20, 30, 40, 75, 150];
-    mapping(uint256 => mapping(address => uint256)) private idtostartingtimet;
+    mapping(uint256 => mapping(address => uint256)) private idToStartingTime;
     mapping(address => uint256[]) allnftstakeforaddress;
     mapping(uint256 => uint256) idtokenrate;
     mapping(uint256 => address) idtostaker;
@@ -109,18 +109,16 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         view
         returns (uint256)
     {
-        bool check;
         for (uint256 i; i < rewardtier.length; i++) {
             string memory numstring = string(
                 abi.encodePacked(tokenId.toString(), rewardtier[i].toString())
             );
 
             if (isValid(proof, numstring) == true) {
-                check = true;
                 return rewardtier[i];
             }
         }
-        require(check == true, "invalid parameters");
+        return 0;
     }
 
     function setstakingstate(bool _state) public onlyOwner {
@@ -138,7 +136,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 _froggyFriends.ownerOf(_tokenIds[i]) == msg.sender,
                 "not your froggynft"
             );
-            idtostartingtimet[_tokenIds[i]][msg.sender] = block.timestamp;
+            idToStartingTime[_tokenIds[i]][msg.sender] = block.timestamp;
             _froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
             idtostaker[_tokenIds[i]] = msg.sender;
             idtokenrate[_tokenIds[i]] = geTokenrewardrate(
@@ -173,25 +171,25 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             uint256 current;
             uint256 reward;
             delete idtostaker[_tokenIds[i]];
-            if (idtostartingtimet[_tokenIds[i]][msg.sender] > 0) {
+            if (idToStartingTime[_tokenIds[i]][msg.sender] > 0) {
                 if (boosted[_tokenIds[i]] == false) {
                     uint256 rate = idtokenrate[_tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[_tokenIds[i]][msg.sender];
+                        idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
                     _ribbit.mint(msg.sender, reward);
-                    idtostartingtimet[_tokenIds[i]][msg.sender] = 0;
+                    idToStartingTime[_tokenIds[i]][msg.sender] = 0;
                 }
 
                 if (boosted[_tokenIds[i]] == true) {
                     uint256 rate = idtokenratewhenboosted[_tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[_tokenIds[i]][msg.sender];
+                        idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     _ribbit.mint(msg.sender, reward);
-                    idtostartingtimet[_tokenIds[i]][msg.sender] = 0;
+                    idToStartingTime[_tokenIds[i]][msg.sender] = 0;
                 }
             }
         }
@@ -253,6 +251,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function claimreward() public {
+        require(allnftstakeforaddress[msg.sender].length > 0, "No froggies staked");
         uint256[] memory tokenIds = new uint256[](
             allnftstakeforaddress[msg.sender].length
         );
@@ -262,15 +261,15 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         uint256 reward;
         uint256 rewardbal;
         for (uint256 i; i < tokenIds.length; i++) {
-            if (idtostartingtimet[tokenIds[i]][msg.sender] > 0) {
+            if (idToStartingTime[tokenIds[i]][msg.sender] > 0) {
                 if (boosted[tokenIds[i]] == false) {
                     uint256 rate = idtokenrate[tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[tokenIds[i]][msg.sender];
+                        idToStartingTime[tokenIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
                     rewardbal += reward;
-                    idtostartingtimet[tokenIds[i]][msg.sender] = block
+                    idToStartingTime[tokenIds[i]][msg.sender] = block
                         .timestamp;
                 }
 
@@ -278,10 +277,10 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                     uint256 rate = idtokenratewhenboosted[tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[tokenIds[i]][msg.sender];
+                        idToStartingTime[tokenIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
-                    idtostartingtimet[tokenIds[i]][msg.sender] = block
+                    idToStartingTime[tokenIds[i]][msg.sender] = block
                         .timestamp;
                 }
             }
@@ -294,12 +293,12 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         uint256 current;
         uint256 reward;
 
-        if (idtostartingtimet[tokenId][msg.sender] > 0) {
+        if (idToStartingTime[tokenId][msg.sender] > 0) {
             if (boosted[tokenId] == false) {
                 uint256 rate = idtokenrate[tokenId];
                 current =
                     block.timestamp -
-                    idtostartingtimet[tokenId][msg.sender];
+                    idToStartingTime[tokenId][msg.sender];
                 reward = ((rate * 10**18) * current) / 86400;
             }
 
@@ -307,7 +306,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 uint256 rate = idtokenratewhenboosted[tokenId];
                 current =
                     block.timestamp -
-                    idtostartingtimet[tokenId][msg.sender];
+                    idToStartingTime[tokenId][msg.sender];
                 reward = (((rate * 10**18) / 1000) * current) / 86400;
             }
 
@@ -315,22 +314,22 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         }
     }
 
-    function checkrewardbalforall() public view returns (uint256) {
+    function checkrewardbalforall(address account) public view returns (uint256) {
         uint256[] memory tokenIds = new uint256[](
-            allnftstakeforaddress[msg.sender].length
+            allnftstakeforaddress[account].length
         );
-        tokenIds = allnftstakeforaddress[msg.sender];
+        tokenIds = allnftstakeforaddress[account];
 
         uint256 current;
         uint256 reward;
         uint256 rewardbal;
         for (uint256 i; i < tokenIds.length; i++) {
-            if (idtostartingtimet[tokenIds[i]][msg.sender] > 0) {
+            if (idToStartingTime[tokenIds[i]][account] > 0) {
                 if (boosted[tokenIds[i]] == false) {
                     uint256 rate = idtokenrate[tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[tokenIds[i]][msg.sender];
+                        idToStartingTime[tokenIds[i]][account];
                     reward = ((rate * 10**18) * current) / 86400;
                     rewardbal += reward;
                 }
@@ -339,18 +338,18 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                     uint256 rate = idtokenratewhenboosted[tokenIds[i]];
                     current =
                         block.timestamp -
-                        idtostartingtimet[tokenIds[i]][msg.sender];
+                        idToStartingTime[tokenIds[i]][account];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
                 }
-                //   idtostartingtimet[tokenIds[i]][msg.sender]=block.timestamp;
+                //   idToStartingTime[tokenIds[i]][account]=block.timestamp;
             }
         }
         return rewardbal;
     }
 
-    function checkallnftstaked() public view returns (uint256[] memory) {
-        return allnftstakeforaddress[msg.sender];
+    function checkallnftstaked(address account) public view returns (uint256[] memory) {
+        return allnftstakeforaddress[account];
     }
 
     function withdrawerc20(address erc20addd, address _to) public onlyOwner {
