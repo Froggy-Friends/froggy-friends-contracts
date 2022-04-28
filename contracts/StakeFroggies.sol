@@ -69,15 +69,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     uint256[] public rewardtier = [20, 30, 40, 75, 150];
     mapping(uint256 => mapping(address => uint256)) private idToStartingTime;
     mapping(address => uint256[]) froggiesStaked;
-    mapping(uint256 => uint256) idtokenrate;
-    mapping(uint256 => address) idtostaker;
+    mapping(uint256 => uint256) idTokenRate;
+    mapping(uint256 => address) idToStaker;
     mapping(uint256 => bool) boosted;
     mapping(uint256 => uint256) previousratebeforeboost;
     mapping(uint256 => uint256) idtokenratewhenboosted;
-
-    // for test
-    uint256 public check;
-    uint256 public check2;
 
     constructor(address _froggyAddress) {
         _froggyFriends = IFroggyFriends(_froggyAddress);
@@ -138,8 +134,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             );
             idToStartingTime[_tokenIds[i]][msg.sender] = block.timestamp;
             _froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
-            idtostaker[_tokenIds[i]] = msg.sender;
-            idtokenrate[_tokenIds[i]] = geTokenrewardrate(
+            idToStaker[_tokenIds[i]] = msg.sender;
+            idTokenRate[_tokenIds[i]] = geTokenrewardrate(
                 _tokenIds[i],
                 proof[i]
             );
@@ -152,7 +148,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         _tokenIds = tokenIds;
         for (uint256 i; i < _tokenIds.length; i++) {
             require(
-                idtostaker[_tokenIds[i]] == msg.sender,
+                idToStaker[_tokenIds[i]] == msg.sender,
                 "you are not the staker"
             );
             _froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
@@ -170,10 +166,10 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
             uint256 current;
             uint256 reward;
-            delete idtostaker[_tokenIds[i]];
+            delete idToStaker[_tokenIds[i]];
             if (idToStartingTime[_tokenIds[i]][msg.sender] > 0) {
                 if (boosted[_tokenIds[i]] == false) {
-                    uint256 rate = idtokenrate[_tokenIds[i]];
+                    uint256 rate = idTokenRate[_tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[_tokenIds[i]][msg.sender];
@@ -223,7 +219,6 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         boosted[tokenIds] = true;
         uint256 _idtokenrate = geTokenrewardrate(tokenIds, proof);
         previousratebeforeboost[tokenIds] = _idtokenrate;
-        check2 = idtokenrate[tokenIds];
         idtokenratewhenboosted[tokenIds] =
             _idtokenrate *
             1000 +
@@ -231,8 +226,6 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 _idtokenrate *
                 1000) /
             100;
-        // uint d= idtokenrate[tokenIds]*1000 + (5*idtokenrate[tokenIds]*1000)/100;
-        check = idtokenratewhenboosted[tokenIds];
         _ribbitItem.burn(msg.sender, boostingid, 1);
     }
 
@@ -247,7 +240,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         );
         boosted[tokenIds] = false;
         idtokenratewhenboosted[tokenIds] = 0;
-        idtokenrate[tokenIds] = previousratebeforeboost[tokenIds];
+        idTokenRate[tokenIds] = previousratebeforeboost[tokenIds];
     }
 
     function claimreward() public {
@@ -263,7 +256,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         for (uint256 i; i < tokenIds.length; i++) {
             if (idToStartingTime[tokenIds[i]][msg.sender] > 0) {
                 if (boosted[tokenIds[i]] == false) {
-                    uint256 rate = idtokenrate[tokenIds[i]];
+                    uint256 rate = idTokenRate[tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[tokenIds[i]][msg.sender];
@@ -295,7 +288,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
         if (idToStartingTime[tokenId][msg.sender] > 0) {
             if (boosted[tokenId] == false) {
-                uint256 rate = idtokenrate[tokenId];
+                uint256 rate = idTokenRate[tokenId];
                 current =
                     block.timestamp -
                     idToStartingTime[tokenId][msg.sender];
@@ -326,7 +319,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         for (uint256 i; i < tokenIds.length; i++) {
             if (idToStartingTime[tokenIds[i]][account] > 0) {
                 if (boosted[tokenIds[i]] == false) {
-                    uint256 rate = idtokenrate[tokenIds[i]];
+                    uint256 rate = idTokenRate[tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[tokenIds[i]][account];
@@ -342,7 +335,6 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
                 }
-                //   idToStartingTime[tokenIds[i]][account]=block.timestamp;
             }
         }
         return rewardbal;
