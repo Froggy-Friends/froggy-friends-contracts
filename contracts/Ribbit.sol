@@ -1,3 +1,32 @@
+// Froggy Friends by Fonzy & Mayan (www.froggyfriendsnft.com) $RIBBIT token
+
+//...................................................@@@@@........................
+//.......................%@@@@@@@@@*.............@@@@#///(@@@@@...................
+//....................@@@&(//(//(/(@@@.........&@@////////////@@@.................
+//....................@@@//////////////@@@@@@@@@@@@/////@@@@/////@@@..............
+//..................%@@/////@@@@@(////////////////////%@@@@/////#@@...............
+//..................@@%//////@@@#///////////////////////////////@@@...............
+//..................@@@/////////////////////////////////////////@@@@..............
+//..................@@(///////////////(///////////////(////////////@@@............
+//...............*@@/(///////////////&@@@@@@(//(@@@@@@/////////////#@@............
+//...............@@////////////////////////(%&&%(///////////////////@@@...........
+//..............@@@/////////////////////////////////////////////////&@@...........
+//..............@@(/////////////////////////////////////////////////@@#...........
+//..............@@@////////////////////////////////////////////////@@@............
+//...............@@@/////////////////////////////////////////////#@@/.............
+//................&@@@//////////////////////////////////////////@@@...............
+//..................*@@@%////////////////////////////////////@@@@.................
+//...............@@@@///////////////////////////////////////(@@@..................
+//............%@@@////////////////............/////////////////@@@................
+//..........%@@#/////////////..................... (/////////////@@@..............
+//.........@@@////////////............................////////////@@@.............
+//........@@(///////(@@@................................(@@&///////&@@............
+//.......@@////////@@@....................................@@@///////@@@...........
+//......@@@///////@@@.......................................@@///////@@%..........
+//.....(@@///////@@@.........................................@@/////(/@@..........
+
+// Development help from Lexi
+
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.13;
@@ -41,22 +70,11 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         return _totalSupply;
     }
 
-    function balanceOf(address account)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function balanceOf(address account) public view virtual override returns (uint256) {
         return _balances[account];
     }
 
-    function transfer(address to, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function transfer(address to, uint256 amount) public virtual override returns (bool) {
         address owner = _msgSender();
         _transfer(owner, to, amount);
         return true;
@@ -71,22 +89,13 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function mint(address add, uint256 amount) external {
-        require(
-            onlyapprovedcontractaddress[msg.sender] == true,
-            "you are not approved  to mint"
-        );
-        require(
-            totalSupply() + amount <= supplycapamount,
-            "mint has exeeeded supplycap"
-        );
+        require(onlyapprovedcontractaddress[msg.sender] == true, "you are not approved  to mint");
+        require(totalSupply() + amount <= supplycapamount, "mint has exeeeded supplycap");
         _mint(add, amount);
     }
 
     function adminmint(address add, uint256 amount) external onlyOwner {
-        require(
-            totalSupply() + amount <= supplycapamount,
-            "mint has exeeeded supplycap"
-        );
+        require(totalSupply() + amount <= supplycapamount, "mint has exeeeded supplycap");
         _mint(add, amount);
     }
 
@@ -98,68 +107,39 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         onlyapprovedcontractaddressforburn[add] = true;
     }
 
-    function removeapprovedcontractaddressforburn(address add)
-        external
-        onlyOwner
-    {
+    function removeapprovedcontractaddressforburn(address add) external onlyOwner {
         onlyapprovedcontractaddressforburn[add] = false;
     }
 
     function burn(address add, uint256 amount) public {
-        require(
-            onlyapprovedcontractaddressforburn[msg.sender] == true,
-            "you are not approved  to burn"
-        );
+        require(onlyapprovedcontractaddressforburn[msg.sender] == true, "you are not approved  to burn");
         _burn(add, amount);
     }
 
-    function allowance(address owner, address spender)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
-    function approve(address spender, uint256 amount)
-        public
-        virtual
-        override
-        returns (bool)
-    {
+    function approve(address spender, uint256 amount) public virtual override returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, amount);
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public virtual override returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) public virtual override returns (bool) {
         address spender = _msgSender();
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
         return true;
     }
 
-    function increaseAllowance(address spender, uint256 addedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         address owner = _msgSender();
         _approve(owner, spender, allowance(owner, spender) + addedValue);
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue)
-        public
-        virtual
-        returns (bool)
-    {
+    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         address owner = _msgSender();
         uint256 currentAllowance = allowance(owner, spender);
         require(
@@ -173,21 +153,14 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         return true;
     }
 
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {
+    function _transfer(address from, address to, uint256 amount) internal virtual {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, amount);
 
         uint256 fromBalance = _balances[from];
-        require(
-            fromBalance >= amount,
-            "ERC20: transfer amount exceeds balance"
-        );
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
         unchecked {
             _balances[from] = fromBalance - amount;
         }
@@ -227,11 +200,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         _afterTokenTransfer(account, address(0), amount);
     }
 
-    function _approve(
-        address owner,
-        address spender,
-        uint256 amount
-    ) internal virtual {
+    function _approve(address owner, address spender, uint256 amount) internal virtual {
         require(owner != address(0), "ERC20: approve from the zero address");
         require(spender != address(0), "ERC20: approve to the zero address");
 
@@ -239,32 +208,17 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         emit Approval(owner, spender, amount);
     }
 
-    function _spendAllowance(
-        address owner,
-        address spender,
-        uint256 amount
-    ) internal virtual {
+    function _spendAllowance(address owner, address spender, uint256 amount) internal virtual {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
-            require(
-                currentAllowance >= amount,
-                "ERC20: insufficient allowance"
-            );
+            require(currentAllowance >= amount, "ERC20: insufficient allowance");
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
         }
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 
-    function _afterTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual {}
+    function _afterTokenTransfer(address from, address to, uint256 amount) internal virtual {}
 }
