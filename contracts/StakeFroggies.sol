@@ -72,7 +72,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     mapping(uint256 => address) idToStaker;
     mapping(uint256 => bool) boosted;
     mapping(uint256 => uint256) defaultRate;
-    mapping(uint256 => uint256) idTokenRateBoosted;
+    mapping(uint256 => uint256) boostedRate;
 
     constructor(address _froggyFriends) {
         froggyFriends = IFroggyFriends(_froggyFriends);
@@ -135,7 +135,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[_froggyIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[_froggyIds[i]];
+                    uint256 rate = boostedRate[_froggyIds[i]];
                     current = block.timestamp - idToStartingTime[_froggyIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     ribbit.mint(msg.sender, reward);
@@ -170,7 +170,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         boosted[froggyId] = true;
         uint256 rate = getTokenRewardRate(froggyId, proof);
         defaultRate[froggyId] = rate;
-        idTokenRateBoosted[froggyId] = rate * 1000 + (ribbitItem.boostPercentage(friend) * rate * 1000) / 100;
+        boostedRate[froggyId] = rate * 1000 + (ribbitItem.boostPercentage(friend) * rate * 1000) / 100;
         ribbitItem.burn(msg.sender, friend, 1);
     }
 
@@ -178,7 +178,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         require(boosted[froggyId] == true, "Friend is not paired");
         require(froggyFriends.ownerOf(froggyId) == msg.sender, "Not your Froggy Friend");
         boosted[froggyId] = false;
-        idTokenRateBoosted[froggyId] = 0;
+        boostedRate[froggyId] = 0;
         idTokenRate[froggyId] = defaultRate[froggyId];
     }
 
@@ -201,7 +201,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[froggyIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[froggyIds[i]];
+                    uint256 rate = boostedRate[froggyIds[i]];
                     current = block.timestamp - idToStartingTime[froggyIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
@@ -225,7 +225,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             }
 
             if (boosted[froggyId] == true) {
-                uint256 rate = idTokenRateBoosted[froggyId];
+                uint256 rate = boostedRate[froggyId];
                 current = block.timestamp - idToStartingTime[froggyId][msg.sender];
                 reward = (((rate * 10**18) / 1000) * current) / 86400;
             }
@@ -253,7 +253,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[froggyIds[i]] == true) {
-                    uint256 rate = idTokenRateBoosted[froggyIds[i]];
+                    uint256 rate = boostedRate[froggyIds[i]];
                     current = block.timestamp - idToStartingTime[froggyIds[i]][account];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     rewardbal += reward;
