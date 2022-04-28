@@ -13,11 +13,11 @@ const { ALCHEMY_API_URL_STG, ALCHEMY_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY, CO
 
 const config: HardhatUserConfig = {
    solidity: {
-      version: "0.8.10",
+      version: "0.8.13",
       settings: {
         optimizer: {
           enabled: true,
-          runs: 200,
+          runs: 800,
         },
       },
     },
