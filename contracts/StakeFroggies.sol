@@ -68,7 +68,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
     uint256[] public rewardtier = [20, 30, 40, 75, 150];
     mapping(uint256 => mapping(address => uint256)) private idToStartingTime;
-    mapping(address => uint256[]) allnftstakeforaddress;
+    mapping(address => uint256[]) froggiesStaked;
     mapping(uint256 => uint256) idtokenrate;
     mapping(uint256 => address) idtostaker;
     mapping(uint256 => bool) boosted;
@@ -143,7 +143,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 _tokenIds[i],
                 proof[i]
             );
-            allnftstakeforaddress[msg.sender].push(_tokenIds[i]);
+            froggiesStaked[msg.sender].push(_tokenIds[i]);
         }
     }
 
@@ -156,14 +156,14 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 "you are not the staker"
             );
             _froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
-            for (uint256 j; j < allnftstakeforaddress[msg.sender].length; j++) {
-                if (allnftstakeforaddress[msg.sender][j] == _tokenIds[i]) {
-                    allnftstakeforaddress[msg.sender][
+            for (uint256 j; j < froggiesStaked[msg.sender].length; j++) {
+                if (froggiesStaked[msg.sender][j] == _tokenIds[i]) {
+                    froggiesStaked[msg.sender][
                         j
-                    ] = allnftstakeforaddress[msg.sender][
-                        allnftstakeforaddress[msg.sender].length - 1
+                    ] = froggiesStaked[msg.sender][
+                        froggiesStaked[msg.sender].length - 1
                     ];
-                    allnftstakeforaddress[msg.sender].pop();
+                    froggiesStaked[msg.sender].pop();
                     break;
                 }
             }
@@ -251,11 +251,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function claimreward() public {
-        require(allnftstakeforaddress[msg.sender].length > 0, "No froggies staked");
+        require(froggiesStaked[msg.sender].length > 0, "No froggies staked");
         uint256[] memory tokenIds = new uint256[](
-            allnftstakeforaddress[msg.sender].length
+            froggiesStaked[msg.sender].length
         );
-        tokenIds = allnftstakeforaddress[msg.sender];
+        tokenIds = froggiesStaked[msg.sender];
 
         uint256 current;
         uint256 reward;
@@ -316,9 +316,9 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
     function checkrewardbalforall(address account) public view returns (uint256) {
         uint256[] memory tokenIds = new uint256[](
-            allnftstakeforaddress[account].length
+            froggiesStaked[account].length
         );
-        tokenIds = allnftstakeforaddress[account];
+        tokenIds = froggiesStaked[account];
 
         uint256 current;
         uint256 reward;
@@ -348,8 +348,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         return rewardbal;
     }
 
-    function checkallnftstaked(address account) public view returns (uint256[] memory) {
-        return allnftstakeforaddress[account];
+    function getFroggiesStaked(address account) public view returns (uint256[] memory) {
+        return froggiesStaked[account];
     }
 
     function withdrawerc20(address erc20addd, address _to) public onlyOwner {
