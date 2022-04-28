@@ -64,7 +64,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     IRibbitItem ribbitItem;
     bool public started = true;
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
-    uint256[] public rewardtier = [20, 30, 40, 75, 150];
+    uint256[] public rewardTiers = [20, 30, 40, 75, 150];
     mapping(uint256 => mapping(address => uint256)) private idToStartingTime;
     mapping(address => uint256[]) froggiesStaked;
     mapping(uint256 => uint256) idTokenRate;
@@ -77,86 +77,58 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         froggyFriends = IFroggyFriends(_froggyFriends);
     }
 
-    function isValid(bytes32[] memory proof, string memory numstr)
-        internal
-        view
-        returns (bool)
-    {
+    function isValid(bytes32[] memory proof, string memory numstr) internal view returns (bool) {
         bytes32 leaf = keccak256(abi.encodePacked(numstr));
         return MerkleProof.verify(proof, root, leaf);
     }
 
-    function setribbitAddress(address add) public onlyOwner {
+    function setRibbitAddress(address add) public onlyOwner {
         ribbit = IRibbit(add);
     }
 
-    function setrewardtierandroot(uint256[] memory settier, bytes32 _root)
-        public
-        onlyOwner
-    {
-        rewardtier = settier;
+    function setRewardTierAndRoot(uint256[] memory _rewardTiers, bytes32 _root) public onlyOwner {
+        rewardTiers = _rewardTiers;
         root = _root;
     }
 
-    function geTokenrewardrate(uint256 tokenId, bytes32[] memory proof)
-        public
-        view
-        returns (uint256)
-    {
-        for (uint256 i; i < rewardtier.length; i++) {
-            string memory numstring = string(
-                abi.encodePacked(tokenId.toString(), rewardtier[i].toString())
-            );
+    function getTokenRewardRate(uint256 tokenId, bytes32[] memory proof) public view returns (uint256) {
+        for (uint256 i; i < rewardTiers.length; i++) {
+            string memory numstring = string(abi.encodePacked(tokenId.toString(), rewardTiers[i].toString()));
 
             if (isValid(proof, numstring) == true) {
-                return rewardtier[i];
+                return rewardTiers[i];
             }
         }
         return 0;
     }
 
-    function setstakingstate(bool _state) public onlyOwner {
+    function setStakingState(bool _state) public onlyOwner {
         started = _state;
     }
 
-    function stake(uint256[] memory tokenIds, bytes32[][] memory proof)
-        external
-    {
-        require(started == true, "staking is paused");
+    function stake(uint256[] memory tokenIds, bytes32[][] memory proof) external {
+        require(started == true, "$RIBBIT staking paused");
         uint256[] memory _tokenIds = new uint256[](tokenIds.length);
         _tokenIds = tokenIds;
         for (uint256 i; i < _tokenIds.length; i++) {
-            require(
-                froggyFriends.ownerOf(_tokenIds[i]) == msg.sender,
-                "not your froggynft"
-            );
+            require(froggyFriends.ownerOf(_tokenIds[i]) == msg.sender, "Not your Froggy Friend");
             idToStartingTime[_tokenIds[i]][msg.sender] = block.timestamp;
             froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
             idToStaker[_tokenIds[i]] = msg.sender;
-            idTokenRate[_tokenIds[i]] = geTokenrewardrate(
-                _tokenIds[i],
-                proof[i]
-            );
+            idTokenRate[_tokenIds[i]] = getTokenRewardRate(_tokenIds[i], proof[i]);
             froggiesStaked[msg.sender].push(_tokenIds[i]);
         }
     }
 
-    function unstake(uint256[] memory tokenIds) external {
+    function unStake(uint256[] memory tokenIds) external {
         uint256[] memory _tokenIds = new uint256[](tokenIds.length);
         _tokenIds = tokenIds;
         for (uint256 i; i < _tokenIds.length; i++) {
-            require(
-                idToStaker[_tokenIds[i]] == msg.sender,
-                "you are not the staker"
-            );
+            require(idToStaker[_tokenIds[i]] == msg.sender, "Not your Froggy Friend");
             froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
             for (uint256 j; j < froggiesStaked[msg.sender].length; j++) {
                 if (froggiesStaked[msg.sender][j] == _tokenIds[i]) {
-                    froggiesStaked[msg.sender][
-                        j
-                    ] = froggiesStaked[msg.sender][
-                        froggiesStaked[msg.sender].length - 1
-                    ];
+                    froggiesStaked[msg.sender][j] = froggiesStaked[msg.sender][froggiesStaked[msg.sender].length - 1];
                     froggiesStaked[msg.sender].pop();
                     break;
                 }
@@ -168,9 +140,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             if (idToStartingTime[_tokenIds[i]][msg.sender] > 0) {
                 if (boosted[_tokenIds[i]] == false) {
                     uint256 rate = idTokenRate[_tokenIds[i]];
-                    current =
-                        block.timestamp -
-                        idToStartingTime[_tokenIds[i]][msg.sender];
+                    current = block.timestamp - idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
                     ribbit.mint(msg.sender, reward);
                     idToStartingTime[_tokenIds[i]][msg.sender] = 0;
@@ -178,9 +148,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
 
                 if (boosted[_tokenIds[i]] == true) {
                     uint256 rate = idTokenRateBoosted[_tokenIds[i]];
-                    current =
-                        block.timestamp -
-                        idToStartingTime[_tokenIds[i]][msg.sender];
+                    current = block.timestamp - idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
                     ribbit.mint(msg.sender, reward);
                     idToStartingTime[_tokenIds[i]][msg.sender] = 0;
@@ -189,7 +157,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         }
     }
 
-    function setboostercontract(address add) public onlyOwner {
+    function setRibbitItemContract(address add) public onlyOwner {
         ribbitItem = IRibbitItem(add);
     }
 
@@ -215,7 +183,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "not your froggynft ,you cant apply boost"
         );
         boosted[tokenIds] = true;
-        uint256 _idtokenrate = geTokenrewardrate(tokenIds, proof);
+        uint256 _idtokenrate = getTokenRewardRate(tokenIds, proof);
         defaultRate[tokenIds] = _idtokenrate;
         idTokenRateBoosted[tokenIds] =
             _idtokenrate *
