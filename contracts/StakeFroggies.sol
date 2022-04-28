@@ -44,7 +44,7 @@ interface IRibbit {
     function mint(address add, uint256 amount) external;
 }
 
-interface IERC20 {
+interface Ierc20 {
     function transfer(address to, uint256 amount) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
 }
@@ -58,12 +58,10 @@ interface IRibbitItem {
 
 contract StakeFroggies is IERC721Receiver, Ownable {
     using Strings for uint256;
-    address public froggyAddress;
-    address public ribbitAddress;
-    IFroggyFriends _froggyFriends;
-    IRibbit _ribbit;
-    IERC20 _erc20interface;
-    IRibbitItem _ribbitItem;
+    IFroggyFriends froggyFriends;
+    IRibbit ribbit;
+    Ierc20 ierc20;
+    IRibbitItem ribbitItem;
     bool public started = true;
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
     uint256[] public rewardtier = [20, 30, 40, 75, 150];
@@ -75,8 +73,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     mapping(uint256 => uint256) defaultRate;
     mapping(uint256 => uint256) idTokenRateBoosted;
 
-    constructor(address _froggyAddress) {
-        _froggyFriends = IFroggyFriends(_froggyAddress);
+    constructor(address _froggyFriends) {
+        froggyFriends = IFroggyFriends(_froggyFriends);
     }
 
     function isValid(bytes32[] memory proof, string memory numstr)
@@ -89,7 +87,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function setribbitAddress(address add) public onlyOwner {
-        _ribbit = IRibbit(add);
+        ribbit = IRibbit(add);
     }
 
     function setrewardtierandroot(uint256[] memory settier, bytes32 _root)
@@ -129,11 +127,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         _tokenIds = tokenIds;
         for (uint256 i; i < _tokenIds.length; i++) {
             require(
-                _froggyFriends.ownerOf(_tokenIds[i]) == msg.sender,
+                froggyFriends.ownerOf(_tokenIds[i]) == msg.sender,
                 "not your froggynft"
             );
             idToStartingTime[_tokenIds[i]][msg.sender] = block.timestamp;
-            _froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
+            froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
             idToStaker[_tokenIds[i]] = msg.sender;
             idTokenRate[_tokenIds[i]] = geTokenrewardrate(
                 _tokenIds[i],
@@ -151,7 +149,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 idToStaker[_tokenIds[i]] == msg.sender,
                 "you are not the staker"
             );
-            _froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
+            froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
             for (uint256 j; j < froggiesStaked[msg.sender].length; j++) {
                 if (froggiesStaked[msg.sender][j] == _tokenIds[i]) {
                     froggiesStaked[msg.sender][
@@ -174,7 +172,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                         block.timestamp -
                         idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = ((rate * 10**18) * current) / 86400;
-                    _ribbit.mint(msg.sender, reward);
+                    ribbit.mint(msg.sender, reward);
                     idToStartingTime[_tokenIds[i]][msg.sender] = 0;
                 }
 
@@ -184,7 +182,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                         block.timestamp -
                         idToStartingTime[_tokenIds[i]][msg.sender];
                     reward = (((rate * 10**18) / 1000) * current) / 86400;
-                    _ribbit.mint(msg.sender, reward);
+                    ribbit.mint(msg.sender, reward);
                     idToStartingTime[_tokenIds[i]][msg.sender] = 0;
                 }
             }
@@ -192,7 +190,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function setboostercontract(address add) public onlyOwner {
-        _ribbitItem = IRibbitItem(add);
+        ribbitItem = IRibbitItem(add);
     }
 
     function boostrate(
@@ -201,11 +199,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         uint256 boostingid
     ) public {
         require(
-            _ribbitItem.balanceOf(msg.sender, boostingid) > 0,
+            ribbitItem.balanceOf(msg.sender, boostingid) > 0,
             "you dont have an erc1155 item"
         );
         require(
-            _ribbitItem.isBoost(boostingid) == true,
+            ribbitItem.isBoost(boostingid) == true,
             "not a boosting item"
         );
         require(
@@ -213,7 +211,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "already boosted,please unboost before applying new boost"
         );
         require(
-            _froggyFriends.ownerOf(tokenIds) == msg.sender,
+            froggyFriends.ownerOf(tokenIds) == msg.sender,
             "not your froggynft ,you cant apply boost"
         );
         boosted[tokenIds] = true;
@@ -222,11 +220,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         idTokenRateBoosted[tokenIds] =
             _idtokenrate *
             1000 +
-            (_ribbitItem.boostPercentage(boostingid) *
+            (ribbitItem.boostPercentage(boostingid) *
                 _idtokenrate *
                 1000) /
             100;
-        _ribbitItem.burn(msg.sender, boostingid, 1);
+        ribbitItem.burn(msg.sender, boostingid, 1);
     }
 
     function unboostrate(uint256 tokenIds) public {
@@ -235,7 +233,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "you have not boosted,please boost before applying  unboost"
         );
         require(
-            _froggyFriends.ownerOf(tokenIds) == msg.sender,
+            froggyFriends.ownerOf(tokenIds) == msg.sender,
             "not your froggynft ,you cant apply unboost"
         );
         boosted[tokenIds] = false;
@@ -279,7 +277,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             }
         }
 
-        _ribbit.mint(msg.sender, rewardbal);
+        ribbit.mint(msg.sender, rewardbal);
     }
 
     function checkrewardbal(uint256 tokenId) public view returns (uint256) {
@@ -345,8 +343,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function withdrawerc20(address erc20addd, address _to) public onlyOwner {
-        _erc20interface = IERC20(erc20addd);
-        _erc20interface.transfer(_to, _erc20interface.balanceOf(address(this)));
+        ierc20 = Ierc20(erc20addd);
+        ierc20.transfer(_to, ierc20.balanceOf(address(this)));
     }
 
     function onERC721Received(
