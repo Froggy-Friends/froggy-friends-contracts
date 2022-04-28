@@ -145,13 +145,13 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         }
     }
 
-    function setRewardTierAndRoot(uint256[] memory _rewardTiers, bytes32 _root) public onlyOwner {
-        rewardTiers = _rewardTiers;
-        root = _root;
+    function setRewardTierAndRoot(uint256[] memory newRewardTier, bytes32 newRoot) public onlyOwner {
+        rewardTiers = newRewardTier;
+        root = newRoot;
     }
 
-    function setStakingState(bool _state) public onlyOwner {
-        started = _state;
+    function setStakingState(bool state) public onlyOwner {
+        started = state;
     }
 
     function setRibbitAddress(address add) public onlyOwner {
@@ -267,9 +267,9 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         return froggiesStaked[account];
     }
 
-    function withdrawerc20(address erc20addd, address _to) public onlyOwner {
-        ierc20 = IErc20(erc20addd);
-        ierc20.transfer(_to, ierc20.balanceOf(address(this)));
+    function withdrawerc20(address add, address to) public onlyOwner {
+        ierc20 = IErc20(add);
+        ierc20.transfer(to, ierc20.balanceOf(address(this)));
     }
 
     function onERC721Received(address, address, uint256, bytes calldata) external pure override returns (bytes4) {
