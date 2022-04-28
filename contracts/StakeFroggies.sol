@@ -72,8 +72,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     mapping(uint256 => uint256) idTokenRate;
     mapping(uint256 => address) idToStaker;
     mapping(uint256 => bool) boosted;
-    mapping(uint256 => uint256) previousratebeforeboost;
-    mapping(uint256 => uint256) idtokenratewhenboosted;
+    mapping(uint256 => uint256) defaultRate;
+    mapping(uint256 => uint256) idTokenRateBoosted;
 
     constructor(address _froggyAddress) {
         _froggyFriends = IFroggyFriends(_froggyAddress);
@@ -179,7 +179,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[_tokenIds[i]] == true) {
-                    uint256 rate = idtokenratewhenboosted[_tokenIds[i]];
+                    uint256 rate = idTokenRateBoosted[_tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[_tokenIds[i]][msg.sender];
@@ -218,8 +218,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         );
         boosted[tokenIds] = true;
         uint256 _idtokenrate = geTokenrewardrate(tokenIds, proof);
-        previousratebeforeboost[tokenIds] = _idtokenrate;
-        idtokenratewhenboosted[tokenIds] =
+        defaultRate[tokenIds] = _idtokenrate;
+        idTokenRateBoosted[tokenIds] =
             _idtokenrate *
             1000 +
             (_ribbitItem.checkpercentage(boostingid) *
@@ -239,8 +239,8 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "not your froggynft ,you cant apply unboost"
         );
         boosted[tokenIds] = false;
-        idtokenratewhenboosted[tokenIds] = 0;
-        idTokenRate[tokenIds] = previousratebeforeboost[tokenIds];
+        idTokenRateBoosted[tokenIds] = 0;
+        idTokenRate[tokenIds] = defaultRate[tokenIds];
     }
 
     function claimreward() public {
@@ -267,7 +267,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[tokenIds[i]] == true) {
-                    uint256 rate = idtokenratewhenboosted[tokenIds[i]];
+                    uint256 rate = idTokenRateBoosted[tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[tokenIds[i]][msg.sender];
@@ -296,7 +296,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             }
 
             if (boosted[tokenId] == true) {
-                uint256 rate = idtokenratewhenboosted[tokenId];
+                uint256 rate = idTokenRateBoosted[tokenId];
                 current =
                     block.timestamp -
                     idToStartingTime[tokenId][msg.sender];
@@ -328,7 +328,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 }
 
                 if (boosted[tokenIds[i]] == true) {
-                    uint256 rate = idtokenratewhenboosted[tokenIds[i]];
+                    uint256 rate = idTokenRateBoosted[tokenIds[i]];
                     current =
                         block.timestamp -
                         idToStartingTime[tokenIds[i]][account];
