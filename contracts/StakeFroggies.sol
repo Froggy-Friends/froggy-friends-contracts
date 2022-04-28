@@ -60,10 +60,10 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     using Strings for uint256;
     address public froggyAddress;
     address public ribbitAddress;
-    IFroggyFriends _froggynft;
+    IFroggyFriends _froggyFriends;
     IRibbit _ribbit;
     IERC20 _erc20interface;
-    IRibbitItem _istakingboster;
+    IRibbitItem _ribbitItem;
     bool public started = true;
     bytes32 public root = 0x339f267449a852acfbd5c472061a8fc4941769c9a3a9784778e7e95f9bb8f18d;
     uint256[] public rewardtier = [20, 30, 40, 75, 150];
@@ -80,7 +80,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     uint256 public check2;
 
     constructor(address _froggyAddress) {
-        _froggynft = IFroggyFriends(_froggyAddress);
+        _froggyFriends = IFroggyFriends(_froggyAddress);
     }
 
     function isValid(bytes32[] memory proof, string memory numstr)
@@ -135,11 +135,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         _tokenIds = tokenIds;
         for (uint256 i; i < _tokenIds.length; i++) {
             require(
-                _froggynft.ownerOf(_tokenIds[i]) == msg.sender,
+                _froggyFriends.ownerOf(_tokenIds[i]) == msg.sender,
                 "not your froggynft"
             );
             idtostartingtimet[_tokenIds[i]][msg.sender] = block.timestamp;
-            _froggynft.transferFrom(msg.sender, address(this), _tokenIds[i]);
+            _froggyFriends.transferFrom(msg.sender, address(this), _tokenIds[i]);
             idtostaker[_tokenIds[i]] = msg.sender;
             idtokenrate[_tokenIds[i]] = geTokenrewardrate(
                 _tokenIds[i],
@@ -157,7 +157,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
                 idtostaker[_tokenIds[i]] == msg.sender,
                 "you are not the staker"
             );
-            _froggynft.transferFrom(address(this), msg.sender, _tokenIds[i]);
+            _froggyFriends.transferFrom(address(this), msg.sender, _tokenIds[i]);
             for (uint256 j; j < allnftstakeforaddress[msg.sender].length; j++) {
                 if (allnftstakeforaddress[msg.sender][j] == _tokenIds[i]) {
                     allnftstakeforaddress[msg.sender][
@@ -198,7 +198,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
     }
 
     function setboostercontract(address add) public onlyOwner {
-        _istakingboster = IRibbitItem(add);
+        _ribbitItem = IRibbitItem(add);
     }
 
     function boostrate(
@@ -207,11 +207,11 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         uint256 boostingid
     ) public {
         require(
-            _istakingboster.balanceOf(msg.sender, boostingid) > 0,
+            _ribbitItem.balanceOf(msg.sender, boostingid) > 0,
             "you dont have an erc1155 item"
         );
         require(
-            _istakingboster.checkifboostid(boostingid) == true,
+            _ribbitItem.checkifboostid(boostingid) == true,
             "not a boosting item"
         );
         require(
@@ -219,7 +219,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "already boosted,please unboost before applying new boost"
         );
         require(
-            _froggynft.ownerOf(tokenIds) == msg.sender,
+            _froggyFriends.ownerOf(tokenIds) == msg.sender,
             "not your froggynft ,you cant apply boost"
         );
         boosted[tokenIds] = true;
@@ -229,13 +229,13 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         idtokenratewhenboosted[tokenIds] =
             _idtokenrate *
             1000 +
-            (_istakingboster.checkpercentage(boostingid) *
+            (_ribbitItem.checkpercentage(boostingid) *
                 _idtokenrate *
                 1000) /
             100;
         // uint d= idtokenrate[tokenIds]*1000 + (5*idtokenrate[tokenIds]*1000)/100;
         check = idtokenratewhenboosted[tokenIds];
-        _istakingboster.burn(msg.sender, boostingid, 1);
+        _ribbitItem.burn(msg.sender, boostingid, 1);
     }
 
     function unboostrate(uint256 tokenIds) public {
@@ -244,7 +244,7 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             "you have not boosted,please boost before applying  unboost"
         );
         require(
-            _froggynft.ownerOf(tokenIds) == msg.sender,
+            _froggyFriends.ownerOf(tokenIds) == msg.sender,
             "not your froggynft ,you cant apply unboost"
         );
         boosted[tokenIds] = false;
