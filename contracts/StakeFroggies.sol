@@ -82,15 +82,6 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         return MerkleProof.verify(proof, root, leaf);
     }
 
-    function setRibbitAddress(address add) public onlyOwner {
-        ribbit = IRibbit(add);
-    }
-
-    function setRewardTierAndRoot(uint256[] memory _rewardTiers, bytes32 _root) public onlyOwner {
-        rewardTiers = _rewardTiers;
-        root = _root;
-    }
-
     function getTokenRewardRate(uint256 tokenId, bytes32[] memory proof) public view returns (uint256) {
         for (uint256 i; i < rewardTiers.length; i++) {
             string memory numstring = string(abi.encodePacked(tokenId.toString(), rewardTiers[i].toString()));
@@ -100,10 +91,6 @@ contract StakeFroggies is IERC721Receiver, Ownable {
             }
         }
         return 0;
-    }
-
-    function setStakingState(bool _state) public onlyOwner {
-        started = _state;
     }
 
     function stake(uint256[] memory tokenIds, bytes32[][] memory proof) external {
@@ -157,56 +144,41 @@ contract StakeFroggies is IERC721Receiver, Ownable {
         }
     }
 
+    function setRewardTierAndRoot(uint256[] memory _rewardTiers, bytes32 _root) public onlyOwner {
+        rewardTiers = _rewardTiers;
+        root = _root;
+    }
+
+    function setStakingState(bool _state) public onlyOwner {
+        started = _state;
+    }
+
+    function setRibbitAddress(address add) public onlyOwner {
+        ribbit = IRibbit(add);
+    }
+
     function setRibbitItemContract(address add) public onlyOwner {
         ribbitItem = IRibbitItem(add);
     }
 
-    function boostrate(
-        uint256 tokenIds,
-        bytes32[] memory proof,
-        uint256 boostingid
-    ) public {
-        require(
-            ribbitItem.balanceOf(msg.sender, boostingid) > 0,
-            "you dont have an erc1155 item"
-        );
-        require(
-            ribbitItem.isBoost(boostingid) == true,
-            "not a boosting item"
-        );
-        require(
-            boosted[tokenIds] == false,
-            "already boosted,please unboost before applying new boost"
-        );
-        require(
-            froggyFriends.ownerOf(tokenIds) == msg.sender,
-            "not your froggynft ,you cant apply boost"
-        );
-        boosted[tokenIds] = true;
-        uint256 _idtokenrate = getTokenRewardRate(tokenIds, proof);
-        defaultRate[tokenIds] = _idtokenrate;
-        idTokenRateBoosted[tokenIds] =
-            _idtokenrate *
-            1000 +
-            (ribbitItem.boostPercentage(boostingid) *
-                _idtokenrate *
-                1000) /
-            100;
-        ribbitItem.burn(msg.sender, boostingid, 1);
+    function pairFriend(uint256 tokenId, bytes32[] memory proof, uint256 friend) public {
+        require(ribbitItem.balanceOf(msg.sender, friend) > 0, "Friend not owned");
+        require(ribbitItem.isBoost(friend) == true, "$RIBBIT item is not a Friend");
+        require(boosted[tokenId] == false, "Friend already paired");
+        require(froggyFriends.ownerOf(tokenId) == msg.sender, "Not your Froggy Friend");
+        boosted[tokenId] = true;
+        uint256 rate = getTokenRewardRate(tokenId, proof);
+        defaultRate[tokenId] = rate;
+        idTokenRateBoosted[tokenId] = rate * 1000 + (ribbitItem.boostPercentage(friend) * rate * 1000) / 100;
+        ribbitItem.burn(msg.sender, friend, 1);
     }
 
-    function unboostrate(uint256 tokenIds) public {
-        require(
-            boosted[tokenIds] == true,
-            "you have not boosted,please boost before applying  unboost"
-        );
-        require(
-            froggyFriends.ownerOf(tokenIds) == msg.sender,
-            "not your froggynft ,you cant apply unboost"
-        );
-        boosted[tokenIds] = false;
-        idTokenRateBoosted[tokenIds] = 0;
-        idTokenRate[tokenIds] = defaultRate[tokenIds];
+    function unpairFriend(uint256 froggyId) public {
+        require(boosted[froggyId] == true, "Friend is not paired");
+        require(froggyFriends.ownerOf(froggyId) == msg.sender, "Not your Froggy Friend");
+        boosted[froggyId] = false;
+        idTokenRateBoosted[froggyId] = 0;
+        idTokenRate[froggyId] = defaultRate[froggyId];
     }
 
     function claimreward() public {
