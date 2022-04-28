@@ -80,11 +80,11 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         return true;
     }
 
-    function setapprovedcontractaddress(address add) external onlyOwner {
+    function setApprovedContractAddress(address add) external onlyOwner {
         onlyApprovedContractAddress[add] = true;
     }
 
-    function removeapprovedcontractaddress(address add) external onlyOwner {
+    function removeApprovedContractAddress(address add) external onlyOwner {
         onlyApprovedContractAddress[add] = false;
     }
 
@@ -94,20 +94,20 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
         _mint(add, amount);
     }
 
-    function adminmint(address add, uint256 amount) external onlyOwner {
+    function adminMint(address add, uint256 amount) external onlyOwner {
         require(totalSupply() + amount <= supplyCapAmount, "$RIBBIT pond is empty");
         _mint(add, amount);
     }
 
-    function setsupplycapamount(uint256 amount) external onlyOwner {
+    function setSupplyCapAmount(uint256 amount) external onlyOwner {
         supplyCapAmount = amount;
     }
 
-    function setapprovedcontractaddressforburn(address add) external onlyOwner {
+    function setApprovedContractAddressForBurn(address add) external onlyOwner {
         onlyApprovedContractAddressForBurn[add] = true;
     }
 
-    function removeapprovedcontractaddressforburn(address add) external onlyOwner {
+    function removeApprovedContractAddressForBurn(address add) external onlyOwner {
         onlyApprovedContractAddressForBurn[add] = false;
     }
 
