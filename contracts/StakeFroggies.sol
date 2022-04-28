@@ -1,4 +1,4 @@
-// Froggy Friends by Fonzy & Mayan (www.froggyfriendsnft.com) $RIBBIT token
+// Froggy Friends by Fonzy & Mayan (www.froggyfriendsnft.com) Stake Froggies
 
 //...................................................@@@@@........................
 //.......................%@@@@@@@@@*.............@@@@#///(@@@@@...................
@@ -28,6 +28,7 @@
 // Development help from Lexi
 
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
