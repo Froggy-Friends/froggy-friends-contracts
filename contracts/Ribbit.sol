@@ -89,13 +89,13 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function mint(address add, uint256 amount) external {
-        require(onlyApprovedContractAddress[msg.sender] == true, "you are not approved  to mint");
-        require(totalSupply() + amount <= supplyCapAmount, "mint has exeeeded supplycap");
+        require(onlyApprovedContractAddress[msg.sender] == true, "Not approved to mint");
+        require(totalSupply() + amount <= supplyCapAmount, "$RIBBIT pond is empty");
         _mint(add, amount);
     }
 
     function adminmint(address add, uint256 amount) external onlyOwner {
-        require(totalSupply() + amount <= supplyCapAmount, "mint has exeeeded supplycap");
+        require(totalSupply() + amount <= supplyCapAmount, "$RIBBIT pond is empty");
         _mint(add, amount);
     }
 
@@ -112,7 +112,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     }
 
     function burn(address add, uint256 amount) public {
-        require(onlyApprovedContractAddressForBurn[msg.sender] == true, "you are not approved  to burn");
+        require(onlyApprovedContractAddressForBurn[msg.sender] == true, "Not approved to burn");
         _burn(add, amount);
     }
 
@@ -142,10 +142,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         address owner = _msgSender();
         uint256 currentAllowance = allowance(owner, spender);
-        require(
-            currentAllowance >= subtractedValue,
-            "ERC20: decreased allowance below zero"
-        );
+        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
         unchecked {
             _approve(owner, spender, currentAllowance - subtractedValue);
         }
