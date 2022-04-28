@@ -47,7 +47,7 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
 
     string private _name;
     string private _symbol;
-    uint256 supplycapamount = 500000000 * 10**18;
+    uint256 supplyCapAmount = 500000000 * 10**18;
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
@@ -90,17 +90,17 @@ contract Ribbit is Context, IERC20, IERC20Metadata, Ownable {
 
     function mint(address add, uint256 amount) external {
         require(onlyApprovedContractAddress[msg.sender] == true, "you are not approved  to mint");
-        require(totalSupply() + amount <= supplycapamount, "mint has exeeeded supplycap");
+        require(totalSupply() + amount <= supplyCapAmount, "mint has exeeeded supplycap");
         _mint(add, amount);
     }
 
     function adminmint(address add, uint256 amount) external onlyOwner {
-        require(totalSupply() + amount <= supplycapamount, "mint has exeeeded supplycap");
+        require(totalSupply() + amount <= supplyCapAmount, "mint has exeeeded supplycap");
         _mint(add, amount);
     }
 
     function setsupplycapamount(uint256 amount) external onlyOwner {
-        supplycapamount = amount;
+        supplyCapAmount = amount;
     }
 
     function setapprovedcontractaddressforburn(address add) external onlyOwner {
