@@ -114,3 +114,6 @@ build/
 #Hardhat files
 cache
 artifacts
+
+#generated files
+ownerTokens.json
