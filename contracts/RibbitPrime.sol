@@ -55,14 +55,12 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
 	string public name;
 	string public symbol;
+    string private baseUrl;
 	// Mapping from token ID to account balances
 	mapping(uint256 => mapping(address => uint256)) private _balances;
 
 	// Mapping from account to operator approvals
 	mapping(address => mapping(address => bool)) private _operatorApprovals;
-
-	// Used as the URI for all token types by relying on ID substitution, e.g. https://token-cdn-domain/{id}.json
-	string private _uri;
 	mapping(uint256 => uint256) _price;
 	mapping(uint256 => uint256) percent;
 	mapping(uint256 => uint256) supply;
@@ -83,17 +81,10 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	mapping(uint256 => address) collabaddresses;
 	uint256 collabidcounter = 1;
 
-	/**
-	 * @dev See {_setURI}.
-	 */
-	constructor(
-		string memory _name,
-		string memory _symbol,
-		string memory uri_
-	) {
+	constructor(string memory _name, string memory _symbol, string memory _baseUrl) {
 		name = _name;
 		symbol = _symbol;
-		_setURI(uri_);
+		baseUrl = _baseUrl;
 		// @fonzy please remember to set this
 		setitem(1, 100000 * 10**18, 10, true, 1);
 		setitem(2, 100000 * 10**18, 100, true, 1);
@@ -115,11 +106,11 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	}
 
 	function uri(uint256 _tokenId) public view virtual override returns (string memory) {
-		return string(abi.encodePacked(_uri, Strings.toString(_tokenId)));
+		return string(abi.encodePacked(baseUrl, Strings.toString(_tokenId)));
 	}
 
-	function setURI(string memory uri_) public onlyOwner {
-		_setURI(uri_);
+	function setURI(string memory _baseUrl) public onlyOwner {
+		baseUrl = _baseUrl;
 	}
 
 	function bundlebuyitem(uint256[] memory ids, uint256[] memory amount) public {
@@ -502,10 +493,6 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		_afterTokenTransfer(operator, from, to, ids, amounts, data);
 
 		_doSafeBatchTransferAcceptanceCheck(operator, from, to, ids, amounts, data);
-	}
-
-	function _setURI(string memory newuri) internal virtual {
-		_uri = newuri;
 	}
 
 	function _mint(
