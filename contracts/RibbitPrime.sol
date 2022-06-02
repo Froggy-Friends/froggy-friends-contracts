@@ -85,14 +85,14 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		name = _name;
 		symbol = _symbol;
 		baseUrl = _baseUrl;
-		// @fonzy please remember to set this
-		setitem(1, 100000 * 10**18, 10, true, 1);
-		setitem(2, 100000 * 10**18, 100, true, 1);
-		setitemforboost(3, 5, 2500 * 10**18, 1000, true, true, 2);
-		setitemforboost(4, 10, 5000 * 10**18, 800, true, true, 2);
-		setitemforboost(5, 15, 7000 * 10**18, 500, true, true, 2);
-		setitemforboost(6, 20, 10000 * 10**18, 300, true, true, 2);
-		setitemforboost(7, 30, 15000 * 10**18, 100, true, true, 2);
+        // debut items on Ribbit Prime
+		setitem(1, 200000 * 10**18, 5, true, 1); // Golden Lily Pad
+		setitemforboost(2,  5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
+		setitemforboost(3, 10,   1800 * 10**18, 150, true, true, 1); // Bear Friend
+		setitemforboost(4, 15,   5000 * 10**18,  75, true, true, 1); // Red Panda Friend
+		setitemforboost(5, 20,  10000 * 10**18,  10, true, true, 1); // Cat Friend
+		setitemforboost(6, 30, 100000 * 10**18,   5, true, true, 1); // Unicorn Friend
+		setitemforboost(7, 30, 300000 * 10**18,   1, true, true, 1); // Golden Tiger Friend
 	}
 
 	/**
@@ -186,15 +186,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		return supply[id];
 	}
 
-	function setitemforboost(
-		uint256 id,
-		uint256 percents,
-		uint256 price_,
-		uint256 _supply,
-		bool boost,
-		bool idtomint,
-		uint256 _mintamountperwallet
-	) public onlyOwner {
+	function setitemforboost(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
 		_price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
@@ -237,13 +229,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		}
 	}
 
-	function setitem(
-		uint256 id,
-		uint256 price_,
-		uint256 _supply,
-		bool idtomint,
-		uint256 _mintamountperwallet
-	) public onlyOwner {
+	function setitem(uint256 id, uint256 price_, uint256 _supply, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
 		_price[id] = price_;
 		supply[id] = _supply;
 		idavailabletomint[id] = idtomint;
