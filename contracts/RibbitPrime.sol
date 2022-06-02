@@ -50,17 +50,15 @@ interface IErc721 {
 	function balanceOf(address owner) external view returns (uint256);
 }
 
-contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
+contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	using Address for address;
 
 	string public name;
 	string public symbol;
     string private baseUrl;
-	// Mapping from token ID to account balances
-	mapping(uint256 => mapping(address => uint256)) private _balances;
-
-	// Mapping from account to operator approvals
-	mapping(address => mapping(address => bool)) private _operatorApprovals;
+	
+    uint256[] idlistedformint;
+    // Mapping from item ID to price
 	mapping(uint256 => uint256) _price;
 	mapping(uint256 => uint256) percent;
 	mapping(uint256 => uint256) supply;
@@ -68,7 +66,11 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	mapping(uint256 => uint256) minted;
 	mapping(uint256 => bool) idavailabletomint;
 	mapping(uint256 => uint256) counter;
-	uint256[] idlistedformint;
+    // Mapping from token ID to account balances
+	mapping(uint256 => mapping(address => uint256)) private _balances;
+	// Mapping from account to operator approvals
+	mapping(address => mapping(address => bool)) private _operatorApprovals;
+	
 	IErc20 _erc20interface;
 	IErc721 froggyfreindsnft;
 
