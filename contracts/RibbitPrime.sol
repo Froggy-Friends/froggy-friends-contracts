@@ -59,7 +59,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	
     uint256[] idlistedformint;
     // Mapping from item ID to price
-	mapping(uint256 => uint256) _price;
+	mapping(uint256 => uint256) price;
 	mapping(uint256 => uint256) percent;
 	mapping(uint256 => uint256) supply;
 	mapping(uint256 => bool) boostid;
@@ -107,8 +107,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(ids.length == amount.length, "please pass in the correct ids and amount");
 		for (uint256 i; i < ids.length; i++) {
 			require(ids[i] > 0, "id must be above 0");
-			require(_price[ids[i]] > 0, "price of item not set");
-			uint256 saleamount = amount[i] * _price[ids[i]];
+			require(price[ids[i]] > 0, "price of item not set");
+			uint256 saleamount = amount[i] * price[ids[i]];
 			require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
 			require(idavailabletomint[ids[i]] == true, "item not available for mint");
 			require(supply[ids[i]] > 0, "supply of item not set");
@@ -134,8 +134,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
 		require(froggyfreindsnft.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
 		require(id > 0, "id must be above 0");
-		require(_price[id] > 0, "price of item not set");
-		uint256 saleamount = amount * _price[id];
+		require(price[id] > 0, "price of item not set");
+		uint256 saleamount = amount * price[id];
 		require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
 		require(idavailabletomint[id] == true, "item not available for mint");
 		require(supply[id] > 0, "supply of item not set");
@@ -156,7 +156,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
-		_price[id] = price_;
+		price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
@@ -169,8 +169,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		}
 	}
 
-	function listCollabFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
-		_price[id] = price_;
+	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
+		price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
@@ -185,8 +185,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		}
 	}
 
-	function listItem(uint256 id, uint256 price_, uint256 _supply, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
-		_price[id] = price_;
+	function listItem(uint256 id, uint256 _price, uint256 _supply, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
+		price[id] = _price;
 		supply[id] = _supply;
 		idavailabletomint[id] = idtomint;
 		mintamountperwallet[id] = _mintamountperwallet;
@@ -235,7 +235,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function viewitemproperties(uint256 id) public view returns (uint256, uint256, uint256, bool) {
-		uint256 pricing = _price[id];
+		uint256 pricing = price[id];
 		uint256 percent_ = percent[id];
 		uint256 supplyi = supply[id];
 		bool checkifboost = boostid[id];
