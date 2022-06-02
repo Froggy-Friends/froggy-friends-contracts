@@ -87,12 +87,17 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		baseUrl = _baseUrl;
         // debut items on Ribbit Prime
 		setitem(1, 200000 * 10**18, 5, true, 1); // Golden Lily Pad
-		setitemforboost(2,  5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
-		setitemforboost(3, 10,   1800 * 10**18, 150, true, true, 1); // Bear Friend
-		setitemforboost(4, 15,   5000 * 10**18,  75, true, true, 1); // Red Panda Friend
-		setitemforboost(5, 20,  10000 * 10**18,  10, true, true, 1); // Cat Friend
-		setitemforboost(6, 30, 100000 * 10**18,   5, true, true, 1); // Unicorn Friend
-		setitemforboost(7, 30, 300000 * 10**18,   1, true, true, 1); // Golden Tiger Friend
+		setitemforboost(2,   5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
+		setitemforboost(3,  10,   1800 * 10**18, 150, true, true, 1); // Bear Friend
+		setitemforboost(4,  15,   5000 * 10**18,  75, true, true, 1); // Red Panda Friend
+		setitemforboost(5,  20,  10000 * 10**18,  10, true, true, 1); // Cat Friend
+		setitemforboost(6,  30, 100000 * 10**18,   5, true, true, 1); // Unicorn Friend
+		setitemforboost(7,  30, 300000 * 10**18,   1, true, true, 1); // Golden Tiger Friend
+        setitemforboost(8,  10,    700 * 10**18,   5, true, true, 1); // Bao Society Friend
+        setitemforboost(9,  10,    700 * 10**18,   5, true, true, 1); // Roo Troop Friend
+        setitemforboost(10,  5,    700 * 10**18,   5, true, true, 1); // Squishiverse Friend
+        setitemforboost(11,  5,    700 * 10**18,   5, true, true, 1); // CryptoMories Friend
+        setitemforboost(12, 10,   1000 * 10**18,   2, true, true, 1); // Kaiju Kings Friend
 	}
 
 	/**
