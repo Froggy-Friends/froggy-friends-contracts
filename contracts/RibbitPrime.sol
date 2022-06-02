@@ -1,7 +1,35 @@
-// SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts v4.4.1 (token/ERC1155/ERC1155.sol)
+// Froggy Friends by Fonzy & Mayan (www.froggyfriendsnft.com) Ribbit Prime
 
-pragma solidity ^0.8.0;
+//...................................................@@@@@........................
+//.......................%@@@@@@@@@*.............@@@@#///(@@@@@...................
+//....................@@@&(//(//(/(@@@.........&@@////////////@@@.................
+//....................@@@//////////////@@@@@@@@@@@@/////@@@@/////@@@..............
+//..................%@@/////@@@@@(////////////////////%@@@@/////#@@...............
+//..................@@%//////@@@#///////////////////////////////@@@...............
+//..................@@@/////////////////////////////////////////@@@@..............
+//..................@@(///////////////(///////////////(////////////@@@............
+//...............*@@/(///////////////&@@@@@@(//(@@@@@@/////////////#@@............
+//...............@@////////////////////////(%&&%(///////////////////@@@...........
+//..............@@@/////////////////////////////////////////////////&@@...........
+//..............@@(/////////////////////////////////////////////////@@#...........
+//..............@@@////////////////////////////////////////////////@@@............
+//...............@@@/////////////////////////////////////////////#@@/.............
+//................&@@@//////////////////////////////////////////@@@...............
+//..................*@@@%////////////////////////////////////@@@@.................
+//...............@@@@///////////////////////////////////////(@@@..................
+//............%@@@////////////////............/////////////////@@@................
+//..........%@@#/////////////..................... (/////////////@@@..............
+//.........@@@////////////............................////////////@@@.............
+//........@@(///////(@@@................................(@@&///////&@@............
+//.......@@////////@@@....................................@@@///////@@@...........
+//......@@@///////@@@.......................................@@///////@@%..........
+//.....(@@///////@@@.........................................@@/////(/@@..........
+
+// Development help from Lexi
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
@@ -12,28 +40,20 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface erc20interface {
+interface IErc20 {
 	function transfer(address to, uint256 amount) external returns (bool);
-
 	function balanceOf(address account) external view returns (uint256);
-
-	function transferFrom(
-		address from,
-		address to,
-		uint256 amount
-	) external returns (bool);
+	function transferFrom(address from,address to,uint256 amount) external returns (bool);
 }
 
-interface erc721nfts {
+interface IErc721 {
 	function balanceOf(address owner) external view returns (uint256);
 }
 
 contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	using Address for address;
 
-	// Contract name
 	string public name;
-	// Contract symbol
 	string public symbol;
 	// Mapping from token ID to account balances
 	mapping(uint256 => mapping(address => uint256)) private _balances;
@@ -51,8 +71,8 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	mapping(uint256 => bool) idavailabletomint;
 	mapping(uint256 => uint256) counter;
 	uint256[] idlistedformint;
-	erc20interface _erc20interface;
-	erc721nfts froggyfreindsnft;
+	IErc20 _erc20interface;
+	IErc721 froggyfreindsnft;
 
 	mapping(address => bool) addresstoburn;
 	mapping(uint256 => mapping(address => uint256)) private track;
@@ -133,7 +153,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		uint256 amount,
 		uint256 collabid
 	) public {
-		erc721nfts collabnfts = erc721nfts(collabaddresses[collabid]);
+		IErc721 collabnfts = IErc721(collabaddresses[collabid]);
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
 		require(froggyfreindsnft.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
 		require(id > 0, "id must be above 0");
@@ -278,8 +298,8 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	}
 
 	function setribbitandfroggynftaddress(address add, address add2) public onlyOwner {
-		_erc20interface = erc20interface(add);
-		froggyfreindsnft = erc721nfts(add2);
+		_erc20interface = IErc20(add);
+		froggyfreindsnft = IErc721(add2);
 	}
 
 	function withdrawribbit() public onlyOwner {
