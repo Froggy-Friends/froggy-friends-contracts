@@ -93,29 +93,12 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		listFriend(5,  20,  10000 * 10**18,  10, true, true, 1); // Cat Friend
 		listFriend(6,  30, 100000 * 10**18,   5, true, true, 1); // Unicorn Friend
 		listFriend(7,  30, 300000 * 10**18,   1, true, true, 1); // Golden Tiger Friend
-        listFriend(8,  10,    700 * 10**18,   5, true, true, 1); // Bao Society Friend
-        listFriend(9,  10,    700 * 10**18,   5, true, true, 1); // Roo Troop Friend
-        listFriend(10,  5,    700 * 10**18,   5, true, true, 1); // Squishiverse Friend
-        listFriend(11,  5,    700 * 10**18,   5, true, true, 1); // CryptoMories Friend
-        listFriend(12, 10,   1000 * 10**18,   2, true, true, 1); // Kaiju Kings Friend
-	}
 
-	/**
-	 * @dev See {IERC165-supportsInterface}.
-	 */
-	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-		return
-			interfaceId == type(IERC1155).interfaceId ||
-			interfaceId == type(IERC1155MetadataURI).interfaceId ||
-			super.supportsInterface(interfaceId);
-	}
-
-	function uri(uint256 _tokenId) public view virtual override returns (string memory) {
-		return string(abi.encodePacked(baseUrl, Strings.toString(_tokenId)));
-	}
-
-	function setURI(string memory _baseUrl) public onlyOwner {
-		baseUrl = _baseUrl;
+        listCollabFriend(8,  10,    700 * 10**18,   5, true, true, 1, 0xba033D82c64DD514B184e2d1405cD395dfE6e706); // Bao Society Friend
+        listCollabFriend(9,  10,    700 * 10**18,   5, true, true, 1, 0x928f072C009727FbAd81bBF3aAa885f9fEa65fcf); // Roo Troop Friend
+        listCollabFriend(10,  5,    700 * 10**18,   5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570); // Squishiverse Friend
+        listCollabFriend(11,  5,    700 * 10**18,   5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7); // CryptoMories Friend
+        listCollabFriend(12, 10,   1000 * 10**18,   2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
 	}
 
 	function bundlebuyitem(uint256[] memory ids, uint256[] memory amount) public {
@@ -144,11 +127,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		}
 	}
 
-	function collabbuyitem(
-		uint256 id,
-		uint256 amount,
-		uint256 collabid
-	) public {
+	function collabbuyitem(uint256 id, uint256 amount, uint256 collabid) public {
 		IErc721 collabnfts = IErc721(collabaddresses[collabid]);
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
 		require(froggyfreindsnft.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
@@ -174,23 +153,6 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		_mint(msg.sender, id, amount, "");
 	}
 
-	function checkidlisted() public view returns (uint256[] memory) {
-		return idlistedformint;
-	}
-
-	function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
-		require(account != address(0), "ERC1155: address zero is not a valid owner");
-		return _balances[id][account];
-	}
-
-	function checkamountsoldout(uint256 id) public view returns (uint256) {
-		return minted[id];
-	}
-
-	function checksupply(uint256 id) public view returns (uint256) {
-		return supply[id];
-	}
-
 	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
 		_price[id] = price_;
 		percent[id] = percents;
@@ -205,20 +167,7 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		}
 	}
 
-	function checkcollabaddresses(uint256 id) public view returns (address) {
-		return collabaddresses[id];
-	}
-
-	function collabsetitemforboost(
-		uint256 id,
-		uint256 percents,
-		uint256 price_,
-		uint256 _supply,
-		bool boost,
-		bool idtomint,
-		uint256 _mintamountperwallet,
-		address collabnftaddres
-	) public onlyOwner {
+	function listCollabFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
 		_price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
@@ -279,6 +228,27 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		return percent[id];
 	}
 
+    function checkidlisted() public view returns (uint256[] memory) {
+		return idlistedformint;
+	}
+
+	function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
+		require(account != address(0), "ERC1155: address zero is not a valid owner");
+		return _balances[id][account];
+	}
+
+	function checkamountsoldout(uint256 id) public view returns (uint256) {
+		return minted[id];
+	}
+
+	function checksupply(uint256 id) public view returns (uint256) {
+		return supply[id];
+	}
+
+    function checkcollabaddresses(uint256 id) public view returns (address) {
+		return collabaddresses[id];
+	}
+
 	function setribbitandfroggynftaddress(address add, address add2) public onlyOwner {
 		_erc20interface = IErc20(add);
 		froggyfreindsnft = IErc721(add2);
@@ -321,6 +291,14 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		}
 	}
 
+    function uri(uint256 _tokenId) public view virtual override returns (string memory) {
+		return string(abi.encodePacked(baseUrl, Strings.toString(_tokenId)));
+	}
+
+	function setURI(string memory _baseUrl) public onlyOwner {
+		baseUrl = _baseUrl;
+	}
+
 	function balanceOfBatch(address[] memory accounts, uint256[] memory ids)
 		public
 		view
@@ -337,6 +315,16 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		}
 
 		return batchBalances;
+	}
+
+    /**
+	 * @dev See {IERC165-supportsInterface}.
+	 */
+	function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+		return
+			interfaceId == type(IERC1155).interfaceId ||
+			interfaceId == type(IERC1155MetadataURI).interfaceId ||
+			super.supportsInterface(interfaceId);
 	}
 
 	/**
