@@ -215,12 +215,15 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_mint(msg.sender, id, remainingitem, "");
 	}
 
-	function viewitemproperties(uint256 id) public view returns (uint256, uint256, uint256, bool) {
-		uint256 pricing = price[id];
-		uint256 percent_ = percent[id];
-		uint256 supplyi = supply[id];
-		bool checkifboost = boost[id];
-		return (pricing, percent_, supplyi, checkifboost);
+	function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
+		uint256 _price = price[id];
+		uint256 _percent = percent[id];
+		uint256 _supply = supply[id];
+		bool _boost = boost[id];
+        uint256 _minted = minted[id];
+        bool _forSale = itemForSale[id];
+        uint256 _walletLimit = walletLimit[id];
+		return (_price, _percent, _supply, _boost, _minted, _forSale, _walletLimit);
 	}
 
     /// @dev isBoost function called by StakeFroggies.sol
