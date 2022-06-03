@@ -80,12 +80,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     IErc20 ribbit;
 	IErc721 froggyFriends;
 
-	constructor(string memory _name, string memory _symbol, string memory _baseUrl, address ribbitAddress, address froggyAddress) {
+	constructor(string memory _name, string memory _symbol, string memory _baseUrl, address _ribbitAddress, address _froggyAddress) {
 		name = _name;
 		symbol = _symbol;
 		baseUrl = _baseUrl;
-        ribbit = IErc20(ribbitAddress);
-        froggyFriends =  IErc721(froggyAddress);
+        ribbit = IErc20(_ribbitAddress);
+        froggyFriends =  IErc721(_froggyAddress);
         // debut items on Ribbit Prime
 		listItem(1, 200000 * 10**18, 5, true, 1); // Golden Lily Pad
 		listFriend(2,   5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
