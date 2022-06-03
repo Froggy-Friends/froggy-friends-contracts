@@ -57,15 +57,13 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	string public symbol;
     string private baseUrl;
 	
-    uint256[] idlistedformint;
     // Mapping from item ID to price
 	mapping(uint256 => uint256) price;
 	mapping(uint256 => uint256) percent;
 	mapping(uint256 => uint256) supply;
 	mapping(uint256 => bool) boostid;
 	mapping(uint256 => uint256) minted;
-	mapping(uint256 => bool) idavailabletomint;
-	mapping(uint256 => uint256) counter;
+	mapping(uint256 => bool) itemForSale;
     // Mapping from token ID to account balances
 	mapping(uint256 => mapping(address => uint256)) private _balances;
 	// Mapping from account to operator approvals
@@ -82,6 +80,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => uint256) mintamountperwallet;
 	mapping(uint256 => address) collabaddresses;
 	uint256 collabidcounter = 1;
+    uint256 idCounter = 1;
 
 	constructor(string memory _name, string memory _symbol, string memory _baseUrl) {
 		name = _name;
@@ -110,7 +109,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(price[ids[i]] > 0, "price of item not set");
 			uint256 saleamount = amount[i] * price[ids[i]];
 			require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
-			require(idavailabletomint[ids[i]] == true, "item not available for mint");
+			require(itemForSale[ids[i]] == true, "item not available for mint");
 			require(supply[ids[i]] > 0, "supply of item not set");
 			require(mintamountperwallet[ids[i]] > 0, "mintamountperwallet of item not set");
 			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
@@ -137,7 +136,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(price[id] > 0, "price of item not set");
 		uint256 saleamount = amount * price[id];
 		require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
-		require(idavailabletomint[id] == true, "item not available for mint");
+		require(itemForSale[id] == true, "item not available for mint");
 		require(supply[id] > 0, "supply of item not set");
 		require(mintamountperwallet[id] > 0, "mintamountperwallet of item not set");
 		require(minted[id] + amount <= supply[id], "already minted above supply");
@@ -155,54 +154,42 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_mint(msg.sender, id, amount, "");
 	}
 
-	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
-		price[id] = price_;
+	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
+		require(id >= idCounter, "ID already used");
+        price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
-		idavailabletomint[id] = idtomint;
+		itemForSale[id] = onSale;
 		mintamountperwallet[id] = _mintamountperwallet;
-
-		if (counter[id] < 1) {
-			idlistedformint.push(id);
-			counter[id]++;
-		}
+        idCounter++;
 	}
 
-	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool idtomint, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
-		price[id] = _price;
+	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
+		require(id >= idCounter, "ID already used");
+        price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
-		idavailabletomint[id] = idtomint;
+		itemForSale[id] = onSale;
 		mintamountperwallet[id] = _mintamountperwallet;
 		collabaddresses[collabidcounter] = collabnftaddres;
-
 		collabidcounter++;
-		if (counter[id] < 1) {
-			idlistedformint.push(id);
-			counter[id]++;
-		}
+		idCounter++;
 	}
 
-	function listItem(uint256 id, uint256 _price, uint256 _supply, bool idtomint, uint256 _mintamountperwallet) public onlyOwner {
-		price[id] = _price;
+	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
+		require(id >= idCounter, "ID already used");
+        price[id] = _price;
 		supply[id] = _supply;
-		idavailabletomint[id] = idtomint;
+		itemForSale[id] = onSale;
 		mintamountperwallet[id] = _mintamountperwallet;
-		if (counter[id] < 1) {
-			idlistedformint.push(id);
-			counter[id]++;
-		}
+		idCounter++;
 	}
 
-	function setidavailableforomint(uint256 id, bool idtomint) public onlyOwner {
-		idavailabletomint[id] = idtomint;
-
-		if (counter[id] < 1) {
-			idlistedformint.push(id);
-			counter[id]++;
-		}
+	function setItemForSale(uint256 id, bool onSale) public onlyOwner {
+        require(id > 0 && id <= idCounter, "ID does not exist");
+        itemForSale[id] = onSale;
 	}
 
     function setapproveaddtoburn(address add) public onlyOwner {
@@ -250,8 +237,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return percent[id];
 	}
 
-    function checkidlisted() public view returns (uint256[] memory) {
-		return idlistedformint;
+    function isItemForSale(uint256 id) public view returns (bool) {
+        return itemForSale[id];
+    }
+
+    function totalItems() public view returns (uint256) {
+		return idCounter;
 	}
 
 	function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
