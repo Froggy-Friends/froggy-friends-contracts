@@ -53,26 +53,28 @@ interface IErc721 {
 contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	using Address for address;
 
+    // Variables
 	string public name;
 	string public symbol;
     string private baseUrl;
+    uint256 collabIdCounter = 1;
+    uint256 idCounter;
 	
-	mapping(uint256 => uint256) price;      // Item ID to price
-	mapping(uint256 => uint256) percent;    // Item ID to boost percentage
-	mapping(uint256 => uint256) supply;     // Item ID to supply
-	mapping(uint256 => bool) boostid;       // Item ID to boost status (true if boost)
-	mapping(uint256 => uint256) minted;     // Item ID to minted supply
-	mapping(uint256 => bool) itemForSale;   // Item ID to sale status (true if on sale)
+    // Maps
+	mapping(uint256 => uint256) price;                  // Item ID to price
+	mapping(uint256 => uint256) percent;                // Item ID to boost percentage
+	mapping(uint256 => uint256) supply;                 // Item ID to supply
+	mapping(uint256 => bool) boostid;                   // Item ID to boost status (true if boost)
+	mapping(uint256 => uint256) minted;                 // Item ID to minted supply
+	mapping(uint256 => bool) itemForSale;               // Item ID to sale status (true if on sale)
+    mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
+    mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
+	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
+    mapping(address => bool) approvedBurnAddress;       // Address to burn state (true if approved)
 	mapping(uint256 => mapping(address => uint256)) private _balances;          // Token ID to map of address to balance
 	mapping(address => mapping(address => bool)) private _operatorApprovals;    // Address to map of address to approval status (true if approved)
 	mapping(uint256 => mapping(address => uint256)) private track;              // Item ID to map of accounts to mint count
 	mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;   // Address to map of item ID to mint count
-    mapping(address => bool) approvedBurnAddress;             // Address to burn state (true if approved)
-	mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
-    mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
-	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
-	uint256 collabIdCounter = 1;
-    uint256 idCounter;
 
     // Interfaces
     IErc20 _erc20interface;
@@ -99,14 +101,14 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function bundlebuyitem(uint256[] memory ids, uint256[] memory amount) public {
-		require(ids.length == amount.length, "please pass in the correct ids and amount");
+		require(ids.length == amount.length, "Ribbit item ID missing");
 		for (uint256 i; i < ids.length; i++) {
-			require(ids[i] > 0, "id must be above 0");
-			require(price[ids[i]] > 0, "price of item not set");
-			uint256 saleamount = amount[i] * price[ids[i]];
-			require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
-			require(itemForSale[ids[i]] == true, "item not available for mint");
-			require(supply[ids[i]] > 0, "supply of item not set");
+			require(ids[i] > 0, "Ribbit item ID must not be zero");
+			require(price[ids[i]] > 0, "Ribbit item price not set");
+			uint256 saleAmount = amount[i] * price[ids[i]];
+			require(_erc20interface.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
+			require(itemForSale[ids[i]] == true, "Ribbit item not for sale");
+			require(supply[ids[i]] > 0, "Ribbit item supply not set");
 			require(mintamountperwallet[ids[i]] > 0, "mintamountperwallet of item not set");
 			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
 			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]], "cant mint above mint amount per wallet");
@@ -115,7 +117,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 				holdersofid[ids[i]].push(msg.sender);
 				track[ids[i]][msg.sender] = 1;
 			}
-			_erc20interface.transferFrom(msg.sender, address(this), saleamount);
+			_erc20interface.transferFrom(msg.sender, address(this), saleAmount);
 			minted[ids[i]] += amount[i];
 			_mint(msg.sender, ids[i], amount[i], "");
 		}
