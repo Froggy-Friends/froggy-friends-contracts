@@ -64,11 +64,11 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => uint256) price;                  // Item ID to price
 	mapping(uint256 => uint256) percent;                // Item ID to boost percentage
 	mapping(uint256 => uint256) supply;                 // Item ID to supply
-	mapping(uint256 => bool) boost;                   // Item ID to boost status (true if boost)
+	mapping(uint256 => bool) boost;                     // Item ID to boost status (true if boost)
 	mapping(uint256 => uint256) minted;                 // Item ID to minted supply
 	mapping(uint256 => bool) itemForSale;               // Item ID to sale status (true if on sale)
     mapping(uint256 => uint256) walletLimit;            // Item ID to mint cap per wallet
-    mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
+    mapping(uint256 => address[]) holders;              // Item ID to list of holder accounts
 	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
     mapping(address => bool) approvedBurnAddress;       // Address to burn state (true if approved)
 	mapping(uint256 => mapping(address => uint256)) private _balances;          // Token ID to map of address to balance
@@ -114,7 +114,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= walletLimit[ids[i]], "Ribbit item wallet limit reached");
 			mintLimitCounter[msg.sender][ids[i]] += amount[i];
 			if (track[ids[i]][msg.sender] < 1) {
-				holdersofid[ids[i]].push(msg.sender);
+				holders[ids[i]].push(msg.sender);
 				track[ids[i]][msg.sender] = 1;
 			}
 			_erc20interface.transferFrom(msg.sender, address(this), saleAmount);
@@ -138,7 +138,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(mintLimitCounter[msg.sender][id] + amount <= walletLimit[id], "cant mint above mint amount per wallet");
 		mintLimitCounter[msg.sender][id] += amount;
 		if (track[id][msg.sender] < 1) {
-			holdersofid[id].push(msg.sender);
+			holders[id].push(msg.sender);
 			track[id][msg.sender] = 1;
 		}
 		_erc20interface.transferFrom(msg.sender, address(this), saleamount);
@@ -196,8 +196,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function adminBurn(uint256 id) public onlyOwner {
-		for (uint256 i; i < holdersofid[id].length; i++) {
-			_burn(holdersofid[id][i], id, (balanceOf(holdersofid[id][i], id)));
+		for (uint256 i; i < holders[id].length; i++) {
+			_burn(holders[id][i], id, (balanceOf(holders[id][i], id)));
 		}
 	}
 
@@ -323,16 +323,16 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 
 		_safeTransferFrom(from, to, id, amount, data);
 		if (track[id][to] < 1) {
-			holdersofid[id].push(to);
+			holders[id].push(to);
 			track[id][to] = 1;
 		}
 
 		if (balanceOf(from, id) == 0) {
 			track[id][from] = 0;
-			for (uint256 j; j < holdersofid[id].length; j++) {
-				if (holdersofid[id][j] == from) {
-					holdersofid[id][j] = holdersofid[id][holdersofid[id].length - 1];
-					holdersofid[id].pop();
+			for (uint256 j; j < holders[id].length; j++) {
+				if (holders[id][j] == from) {
+					holders[id][j] = holders[id][holders[id].length - 1];
+					holders[id].pop();
 					break;
 				}
 			}
@@ -340,7 +340,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function checkallholdersid(uint256 id) public view returns (address[] memory) {
-		return holdersofid[id];
+		return holders[id];
 	}
 
 	/**
@@ -351,16 +351,16 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_safeBatchTransferFrom(from, to, ids, amounts, data);
 		for (uint256 i; i < ids.length; i++) {
 			if (track[ids[i]][to] < 1) {
-				holdersofid[ids[i]].push(to);
+				holders[ids[i]].push(to);
 				track[ids[i]][to] = 1;
 			}
 
 			if (balanceOf(from, ids[i]) == 0) {
 				track[ids[i]][from] = 0;
-				for (uint256 j; j < holdersofid[ids[i]].length; j++) {
-					if (holdersofid[ids[i]][j] == from) {
-						holdersofid[ids[i]][j] = holdersofid[ids[i]][holdersofid[ids[i]].length - 1];
-						holdersofid[ids[i]].pop();
+				for (uint256 j; j < holders[ids[i]].length; j++) {
+					if (holders[ids[i]][j] == from) {
+						holders[ids[i]][j] = holders[ids[i]][holders[ids[i]].length - 1];
+						holders[ids[i]].pop();
 						break;
 					}
 				}
