@@ -63,11 +63,11 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => bool) boostid;       // Item ID to boost status (true if boost)
 	mapping(uint256 => uint256) minted;     // Item ID to minted supply
 	mapping(uint256 => bool) itemForSale;   // Item ID to sale status (true if on sale)
-	mapping(uint256 => mapping(address => uint256)) private _balances;                  // Token ID to map of address to balance
-	mapping(address => mapping(address => bool)) private _operatorApprovals;            // Address to map of address to approval status (true if approved)
-	mapping(uint256 => mapping(address => uint256)) private track;                      // Item ID to map of accounts to mint count
-	mapping(address => mapping(uint256 => uint256)) private mintamountperwalletcounter; // Address to map of item ID to mint count
-    mapping(address => bool) addresstoburn;             // Address to burn state (true if approved)
+	mapping(uint256 => mapping(address => uint256)) private _balances;          // Token ID to map of address to balance
+	mapping(address => mapping(address => bool)) private _operatorApprovals;    // Address to map of address to approval status (true if approved)
+	mapping(uint256 => mapping(address => uint256)) private track;              // Item ID to map of accounts to mint count
+	mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;   // Address to map of item ID to mint count
+    mapping(address => bool) approvedBurnAddress;             // Address to burn state (true if approved)
 	mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
     mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
 	mapping(uint256 => address) collabaddresses;        // Item ID to collab account
@@ -110,10 +110,10 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(mintamountperwallet[ids[i]] > 0, "mintamountperwallet of item not set");
 			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
 			require(
-				mintamountperwalletcounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]],
+				mintLimitCounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]],
 				"cant mint above mint amount per wallet"
 			);
-			mintamountperwalletcounter[msg.sender][ids[i]] += amount[i];
+			mintLimitCounter[msg.sender][ids[i]] += amount[i];
 			if (track[ids[i]][msg.sender] < 1) {
 				holdersofid[ids[i]].push(msg.sender);
 				track[ids[i]][msg.sender] = 1;
@@ -137,10 +137,10 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(mintamountperwallet[id] > 0, "mintamountperwallet of item not set");
 		require(minted[id] + amount <= supply[id], "already minted above supply");
 		require(
-			mintamountperwalletcounter[msg.sender][id] + amount <= mintamountperwallet[id],
+			mintLimitCounter[msg.sender][id] + amount <= mintamountperwallet[id],
 			"cant mint above mint amount per wallet"
 		);
-		mintamountperwalletcounter[msg.sender][id] += amount;
+		mintLimitCounter[msg.sender][id] += amount;
 		if (track[id][msg.sender] < 1) {
 			holdersofid[id].push(msg.sender);
 			track[id][msg.sender] = 1;
@@ -189,12 +189,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
         itemForSale[id] = onSale;
 	}
 
-    function setapproveaddtoburn(address add) public onlyOwner {
-		addresstoburn[add] = true;
+    function setApprovedBurnAddress(address add, bool canBurn) public onlyOwner {
+		approvedBurnAddress[add] = canBurn;
 	}
 
 	function burn(address from, uint256 id, uint256 amount) public {
-		require(addresstoburn[msg.sender] == true, "you are not permitted to burn");
+		require(approvedBurnAddress[msg.sender] == true, "Not an approved burn address");
 		_burn(from, id, amount);
 	}
 
