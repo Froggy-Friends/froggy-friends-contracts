@@ -189,7 +189,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		approvedBurnAddress[add] = canBurn;
 	}
 
-	function burn(address from, uint256 id, uint256 amount) public {
+    /// @dev burn function called by StakeFroggies.sol
+	function burn(address from, uint256 id, uint256 amount) external {
 		require(approvedBurnAddress[msg.sender] == true, "Not an approved burn address");
 		_burn(from, id, amount);
 	}
@@ -222,11 +223,13 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return (pricing, percent_, supplyi, checkifboost);
 	}
 
-	function checkifboostid(uint256 id) public view returns (bool) {
+    /// @dev isBoost function called by StakeFroggies.sol
+	function isBoost(uint256 id) external view returns (bool) {
 		return boostid[id];
 	}
 
-	function checkpercentage(uint256 id) public view returns (uint256) {
+    /// @dev boostPercentage function called by StakeFroggies.sol
+	function boostPercentage(uint256 id) external view returns (uint256) {
 		return percent[id];
 	}
 
