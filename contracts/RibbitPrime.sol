@@ -80,10 +80,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     IErc20 ribbit;
 	IErc721 froggyFriends;
 
-	constructor(string memory _name, string memory _symbol, string memory _baseUrl) {
+	constructor(string memory _name, string memory _symbol, string memory _baseUrl, address ribbitAddress, address froggyAddress) {
 		name = _name;
 		symbol = _symbol;
 		baseUrl = _baseUrl;
+        ribbit = IErc20(ribbitAddress);
+        froggyFriends =  IErc721(froggyAddress);
         // debut items on Ribbit Prime
 		listItem(1, 200000 * 10**18, 5, true, 1); // Golden Lily Pad
 		listFriend(2,   5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
@@ -269,15 +271,20 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return holders[id];
 	}
 
-	function setribbitandfroggynftaddress(address add, address add2) public onlyOwner {
-		ribbit = IErc20(add);
-		froggyFriends = IErc721(add2);
+    function setRibbitAddress(address add) public onlyOwner {
+        ribbit = IErc20(add);
+    }
+
+	function setFroggyFriendsAddress(address add) public onlyOwner {
+		froggyFriends = IErc721(add);
 	}
 
-	function withdrawribbit() public onlyOwner {
+	function withdrawRibbit() public onlyOwner {
 		ribbit.transfer(msg.sender, ribbit.balanceOf(address(this)));
 	}
 
+    /// @dev uri fills the base url with the supplied item id
+    /// @dev output format example if hosted on API https://api.froggyfriendsnft.com/item/{id}
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
 		return string(abi.encodePacked(baseUrl, Strings.toString(_tokenId)));
 	}
