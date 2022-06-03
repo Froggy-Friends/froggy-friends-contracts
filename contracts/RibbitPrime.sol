@@ -70,8 +70,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     mapping(address => bool) approvedBurnAddress;             // Address to burn state (true if approved)
 	mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
     mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
-	mapping(uint256 => address) collabaddresses;        // Item ID to collab account
-	uint256 collabidcounter = 1;
+	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
+	uint256 collabIdCounter = 1;
     uint256 idCounter;
 
     // Interfaces
@@ -109,10 +109,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(supply[ids[i]] > 0, "supply of item not set");
 			require(mintamountperwallet[ids[i]] > 0, "mintamountperwallet of item not set");
 			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
-			require(
-				mintLimitCounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]],
-				"cant mint above mint amount per wallet"
-			);
+			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]], "cant mint above mint amount per wallet");
 			mintLimitCounter[msg.sender][ids[i]] += amount[i];
 			if (track[ids[i]][msg.sender] < 1) {
 				holdersofid[ids[i]].push(msg.sender);
@@ -125,7 +122,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function collabbuyitem(uint256 id, uint256 amount, uint256 collabid) public {
-		IErc721 collabnfts = IErc721(collabaddresses[collabid]);
+		IErc721 collabnfts = IErc721(collabAddresses[collabid]);
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
 		require(froggyfreindsnft.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
 		require(id > 0, "id must be above 0");
@@ -136,10 +133,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(supply[id] > 0, "supply of item not set");
 		require(mintamountperwallet[id] > 0, "mintamountperwallet of item not set");
 		require(minted[id] + amount <= supply[id], "already minted above supply");
-		require(
-			mintLimitCounter[msg.sender][id] + amount <= mintamountperwallet[id],
-			"cant mint above mint amount per wallet"
-		);
+		require(mintLimitCounter[msg.sender][id] + amount <= mintamountperwallet[id], "cant mint above mint amount per wallet");
 		mintLimitCounter[msg.sender][id] += amount;
 		if (track[id][msg.sender] < 1) {
 			holdersofid[id].push(msg.sender);
@@ -151,7 +145,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
-		require(id > idCounter, "ID already used");
+		require(id > idCounter, "ID already listed");
         price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
@@ -162,20 +156,20 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
-		require(id > idCounter, "ID already used");
+		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
 		itemForSale[id] = onSale;
 		mintamountperwallet[id] = _mintamountperwallet;
-		collabaddresses[collabidcounter] = collabnftaddres;
-		collabidcounter++;
+		collabAddresses[collabIdCounter] = collabnftaddres;
+		collabIdCounter++;
 		idCounter++;
 	}
 
 	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
-		require(id > idCounter, "ID already used");
+		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		supply[id] = _supply;
 		itemForSale[id] = onSale;
@@ -255,8 +249,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return supply[id];
 	}
 
+    function totalCollabs() public view returns (uint256) {
+        return collabIdCounter;
+    }
+
     function checkcollabaddresses(uint256 id) public view returns (address) {
-		return collabaddresses[id];
+		return collabAddresses[id];
 	}
 
 	function setribbitandfroggynftaddress(address add, address add2) public onlyOwner {
