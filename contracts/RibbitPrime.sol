@@ -86,8 +86,9 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		baseUrl = _baseUrl;
         ribbit = IErc20(_ribbitAddress);
         froggyFriends =  IErc721(_froggyAddress);
-        // debut items on Ribbit Prime
-		listItem(1, 200000 * 10**18, 5, true, 1); // Golden Lily Pad
+
+        // Ribbit Items
+		listItem(1,        200000 * 10**18, 5, true, 1);         // Golden Lily Pad
 		listFriend(2,   5,    700 * 10**18, 200, true, true, 1); // Rabbit Friend
 		listFriend(3,  10,   1800 * 10**18, 150, true, true, 1); // Bear Friend
 		listFriend(4,  15,   5000 * 10**18,  75, true, true, 1); // Red Panda Friend
@@ -102,6 +103,9 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
         listCollabFriend(12, 10,   1000 * 10**18,   2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
 	}
 
+    /// @notice Bundle buy Ribbit Items
+    /// @param ids list of ribbit item ids to buy
+    /// @param amount list of ribbit item amounts
 	function bundlebuyitem(uint256[] memory ids, uint256[] memory amount) public {
 		require(ids.length == amount.length, "Ribbit item ID missing");
 		for (uint256 i; i < ids.length; i++) {
@@ -125,8 +129,12 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		}
 	}
 
-	function collabbuyitem(uint256 id, uint256 amount, uint256 collabid) public {
-		IErc721 collabnfts = IErc721(collabAddresses[collabid]);
+    /// @notice Buy collab friend 
+    /// @param id the ribbit item id
+    /// @param amount the amount of the ribbit item
+    /// @param collabId the collab id of the ribbit item
+	function collabbuyitem(uint256 id, uint256 amount, uint256 collabId) public {
+		IErc721 collabnfts = IErc721(collabAddresses[collabId]);
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
 		require(froggyFriends.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
 		require(id > 0, "id must be above 0");
@@ -148,35 +156,58 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_mint(msg.sender, id, amount, "");
 	}
 
-	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool _boost, bool onSale, uint256 _walletLimit) public onlyOwner {
+    /// @notice list friend ribbit item
+    /// @param id the ribbit item id
+    /// @param _percent the friend boost percentage
+    /// @param _price the friend price
+    /// @param _supply the friend supply
+    /// @param _boost the friend boost status (true if is a boost)
+    /// @param _onSale the friend sale status (true if is on sale)
+    /// @param _walletLimit the friend wallet limit
+	function listFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit) public onlyOwner {
 		require(id > idCounter, "ID already listed");
-        price[id] = price_;
-		percent[id] = percents;
+        price[id] = _price;
+		percent[id] = _percent;
 		supply[id] = _supply;
 		boost[id] = _boost;
-		itemForSale[id] = onSale;
+		itemForSale[id] = _onSale;
 		walletLimit[id] = _walletLimit;
         idCounter++;
 	}
 
-	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool _boost, bool onSale, uint256 _walletLimit, address collabnftaddres) public onlyOwner {
+    /// @notice list collab friend item
+    /// @param id the ribbit item id
+    /// @param _percent the collab friend boost percentage
+    /// @param _price the collab friend price
+    /// @param _supply the collab friend supply
+    /// @param _boost the collab friend boost status (true if is a boost)
+    /// @param _onSale the collab friend sale status (true if is on sale)
+    /// @param _walletLimit the collab friend wallet limit
+    /// @param collabAddress the collab NFT address
+	function listCollabFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit, address collabAddress) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
-		percent[id] = percents;
+		percent[id] = _percent;
 		supply[id] = _supply;
 		boost[id] = _boost;
-		itemForSale[id] = onSale;
+		itemForSale[id] = _onSale;
 		walletLimit[id] = _walletLimit;
-		collabAddresses[collabIdCounter] = collabnftaddres;
+		collabAddresses[collabIdCounter] = collabAddress;
 		collabIdCounter++;
 		idCounter++;
 	}
 
-	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _walletLimit) public onlyOwner {
+    /// @notice list ribbit item
+    /// @param id the ribbit item id
+    /// @param _price the ribbit item price
+    /// @param _supply the ribbit item supply
+    /// @param _onSale the ribbit item sale status (true if is on sale)
+    /// @param _walletLimit the ribbit item wallet limit
+	function listItem(uint256 id, uint256 _price, uint256 _supply, bool _onSale, uint256 _walletLimit) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		supply[id] = _supply;
-		itemForSale[id] = onSale;
+		itemForSale[id] = _onSale;
 		walletLimit[id] = _walletLimit;
 		idCounter++;
 	}
