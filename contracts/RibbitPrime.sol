@@ -183,8 +183,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @param _boost the collab friend boost status (true if is a boost)
     /// @param _onSale the collab friend sale status (true if is on sale)
     /// @param _walletLimit the collab friend wallet limit
-    /// @param collabAddress the collab NFT address
-	function listCollabFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit, address collabAddress) public onlyOwner {
+    /// @param _collabAddress the collab NFT address
+	function listCollabFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit, address _collabAddress) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		percent[id] = _percent;
@@ -192,7 +192,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		boost[id] = _boost;
 		itemForSale[id] = _onSale;
 		walletLimit[id] = _walletLimit;
-		collabAddresses[collabIdCounter] = collabAddress;
+		collabAddresses[collabIdCounter] = _collabAddress;
 		collabIdCounter++;
 		idCounter++;
 	}
@@ -212,42 +212,64 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		idCounter++;
 	}
 
+    /// @notice sets ribbit item sale status
+    /// @param id the ribbit item id
+    /// @param onSale the ribbit item sale status (true if is on sale)
 	function setItemForSale(uint256 id, bool onSale) public onlyOwner {
-        require(id > 0, "ID must not be zero");
         require(id <= idCounter, "ID does not exist");
         itemForSale[id] = onSale;
 	}
 
+    /// @notice sets address burn permissions
+    /// @param add the address to update permissions for
+    /// @param canBurn the permissions to grant (true if is approved for burning)
     function setApprovedBurnAddress(address add, bool canBurn) public onlyOwner {
 		approvedBurnAddress[add] = canBurn;
 	}
 
+    /// @notice burns the amount of ribbit items specified
+    /// @param from the address to burn the ribbit item from
+    /// @param id the ribbit item id
+    /// @param amount the amount of ribbit items to burn
     /// @dev burn function called by StakeFroggies.sol
 	function burn(address from, uint256 id, uint256 amount) external {
-		require(approvedBurnAddress[msg.sender] == true, "Not an approved burn address");
+		require(approvedBurnAddress[msg.sender] == true, "Address not approved for burning");
 		_burn(from, id, amount);
 	}
 
+    /// @notice admin burns the entire ribbit item supply
+    /// @param id the ribbit item id
+    /// @dev only admin can burn the ribbit item supply
+    /// @dev only use to burn temporary ribbit items
 	function adminBurn(uint256 id) public onlyOwner {
 		for (uint256 i; i < holders[id].length; i++) {
 			_burn(holders[id][i], id, (balanceOf(holders[id][i], id)));
 		}
 	}
 
-    function withdrawnumberofitem(uint256 id, uint256 amount) public onlyOwner {
-		require(minted[id] + amount <= supply[id], "already minted above supply");
+    /// @notice admin mint ribbit item to address
+    /// @param account the address to mint the ribbit item to
+    /// @param id the ribbit item id
+    /// @param amount the amount of ribbit items
+    function adminMint(address account, uint256 id, uint256 amount) public onlyOwner {
+		require(minted[id] + amount <= supply[id], "Ribbit item supply exceeded");
 		minted[id] += amount;
-		_mint(msg.sender, id, amount, "");
+		_mint(account, id, amount, "");
 	}
 
-	function withdrawallitem(uint256 id) public onlyOwner {
-		uint256 remainingitem = supply[id] - minted[id];
-		require(minted[id] + remainingitem <= supply[id], "");
-		require(remainingitem > 0, "already minted above supply,remaining item equals 0");
-		minted[id] += remainingitem;
-		_mint(msg.sender, id, remainingitem, "");
+    /// @notice admin mints remaining ribbit items
+    /// @param id the ribbit item id
+	function adminMintAll(uint256 id) public onlyOwner {
+		uint256 remaining = supply[id] - minted[id];
+		require(minted[id] + remaining <= supply[id], "");
+		require(remaining > 0, "Ribbit item supply reached");
+		minted[id] += remaining;
+		_mint(msg.sender, id, remaining, "");
 	}
 
+    /// @notice returns ribbit item properties by id
+    /// @param id the ribbit item id
+    /// @return item properties
 	function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
 		uint256 _price = price[id];
 		uint256 _percent = percent[id];
@@ -259,57 +281,81 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return (_price, _percent, _supply, _boost, _minted, _forSale, _walletLimit);
 	}
 
+    /// @notice returns the ribbit item boost status (true if is boost)
+    /// @param id the ribbit item id
     /// @dev isBoost function called by StakeFroggies.sol
 	function isBoost(uint256 id) external view returns (bool) {
 		return boost[id];
 	}
 
+    /// @notice returns the ribbit item boost percentage
+    /// @param id the ribbit item id
     /// @dev boostPercentage function called by StakeFroggies.sol
 	function boostPercentage(uint256 id) external view returns (uint256) {
 		return percent[id];
 	}
 
+    /// @notice returns the ribbit item sale status (true if is on sale)
+    /// @param id the ribbit item id
     function isItemForSale(uint256 id) public view returns (bool) {
         return itemForSale[id];
     }
 
+    /// @notice returns the total number of ribbit items listed
     function totalItems() public view returns (uint256) {
 		return idCounter;
 	}
 
+    /// @notice returns the number of ribbit items an account owns
+    /// @param account the address to check the balance of
+    /// @param id the ribbit item id
 	function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
 		require(account != address(0), "ERC1155: address zero is not a valid owner");
 		return _balances[id][account];
 	}
 
+    /// @notice returns the minted supply of a ribbit item
+    /// @param id the ribbit item id
 	function mintedSupply(uint256 id) public view returns (uint256) {
 		return minted[id];
 	}
 
+    /// @notice returns the max supply of a ribbit item
+    /// @param id the ribbit item id
 	function itemSupply(uint256 id) public view returns (uint256) {
 		return supply[id];
 	}
 
+    /// @notice returns the number of collab friends listed
     function totalCollabs() public view returns (uint256) {
         return collabIdCounter;
     }
 
-    function checkcollabaddresses(uint256 id) public view returns (address) {
+    /// @notice returns the collab address of a collab friend
+    /// @param id the ribbit item id
+    function collabAddress(uint256 id) public view returns (address) {
 		return collabAddresses[id];
 	}
 
+    /// @notice returns ribbit item holders
+    /// @param id the ribbit item id
     function itemHolders(uint256 id) public view returns (address[] memory) {
 		return holders[id];
 	}
 
-    function setRibbitAddress(address add) public onlyOwner {
-        ribbit = IErc20(add);
+    /// @notice sets the ribbit contract address
+    /// @param account the ribbit address
+    function setRibbitAddress(address account) public onlyOwner {
+        ribbit = IErc20(account);
     }
 
-	function setFroggyFriendsAddress(address add) public onlyOwner {
-		froggyFriends = IErc721(add);
+    /// @notice sets the froggy friends contract address
+    /// @param account the froggy friends address
+	function setFroggyFriendsAddress(address account) public onlyOwner {
+		froggyFriends = IErc721(account);
 	}
 
+    /// @notice withdraws ribbit balance from this contract to the admin account
 	function withdrawRibbit() public onlyOwner {
 		ribbit.transfer(msg.sender, ribbit.balanceOf(address(this)));
 	}
