@@ -67,7 +67,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => bool) boostid;                   // Item ID to boost status (true if boost)
 	mapping(uint256 => uint256) minted;                 // Item ID to minted supply
 	mapping(uint256 => bool) itemForSale;               // Item ID to sale status (true if on sale)
-    mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
+    mapping(uint256 => uint256) walletLimit;            // Item ID to mint cap per wallet
     mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
 	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
     mapping(address => bool) approvedBurnAddress;       // Address to burn state (true if approved)
@@ -109,9 +109,9 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(_erc20interface.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
 			require(itemForSale[ids[i]] == true, "Ribbit item not for sale");
 			require(supply[ids[i]] > 0, "Ribbit item supply not set");
-			require(mintamountperwallet[ids[i]] > 0, "mintamountperwallet of item not set");
+			require(walletLimit[ids[i]] > 0, "Ribbit item wallet limit not set");
 			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
-			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= mintamountperwallet[ids[i]], "cant mint above mint amount per wallet");
+			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= walletLimit[ids[i]], "Ribbit item wallet limit reached");
 			mintLimitCounter[msg.sender][ids[i]] += amount[i];
 			if (track[ids[i]][msg.sender] < 1) {
 				holdersofid[ids[i]].push(msg.sender);
@@ -133,9 +133,9 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
 		require(itemForSale[id] == true, "item not available for mint");
 		require(supply[id] > 0, "supply of item not set");
-		require(mintamountperwallet[id] > 0, "mintamountperwallet of item not set");
+		require(walletLimit[id] > 0, "walletLimit of item not set");
 		require(minted[id] + amount <= supply[id], "already minted above supply");
-		require(mintLimitCounter[msg.sender][id] + amount <= mintamountperwallet[id], "cant mint above mint amount per wallet");
+		require(mintLimitCounter[msg.sender][id] + amount <= walletLimit[id], "cant mint above mint amount per wallet");
 		mintLimitCounter[msg.sender][id] += amount;
 		if (track[id][msg.sender] < 1) {
 			holdersofid[id].push(msg.sender);
@@ -146,36 +146,36 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_mint(msg.sender, id, amount, "");
 	}
 
-	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
+	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _walletLimit) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
 		itemForSale[id] = onSale;
-		mintamountperwallet[id] = _mintamountperwallet;
+		walletLimit[id] = _walletLimit;
         idCounter++;
 	}
 
-	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
+	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _walletLimit, address collabnftaddres) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
 		boostid[id] = boost;
 		itemForSale[id] = onSale;
-		mintamountperwallet[id] = _mintamountperwallet;
+		walletLimit[id] = _walletLimit;
 		collabAddresses[collabIdCounter] = collabnftaddres;
 		collabIdCounter++;
 		idCounter++;
 	}
 
-	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
+	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _walletLimit) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		supply[id] = _supply;
 		itemForSale[id] = onSale;
-		mintamountperwallet[id] = _mintamountperwallet;
+		walletLimit[id] = _walletLimit;
 		idCounter++;
 	}
 
