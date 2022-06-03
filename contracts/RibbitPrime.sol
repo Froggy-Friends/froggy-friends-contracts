@@ -77,8 +77,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;   // Address to map of item ID to mint count
 
     // Interfaces
-    IErc20 _erc20interface;
-	IErc721 froggyfreindsnft;
+    IErc20 ribbit;
+	IErc721 froggyFriends;
 
 	constructor(string memory _name, string memory _symbol, string memory _baseUrl) {
 		name = _name;
@@ -106,7 +106,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(ids[i] > 0, "Ribbit item ID must not be zero");
 			require(price[ids[i]] > 0, "Ribbit item price not set");
 			uint256 saleAmount = amount[i] * price[ids[i]];
-			require(_erc20interface.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
+			require(ribbit.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
 			require(itemForSale[ids[i]] == true, "Ribbit item not for sale");
 			require(supply[ids[i]] > 0, "Ribbit item supply not set");
 			require(walletLimit[ids[i]] > 0, "Ribbit item wallet limit not set");
@@ -117,7 +117,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 				holders[ids[i]].push(msg.sender);
 				track[ids[i]][msg.sender] = 1;
 			}
-			_erc20interface.transferFrom(msg.sender, address(this), saleAmount);
+			ribbit.transferFrom(msg.sender, address(this), saleAmount);
 			minted[ids[i]] += amount[i];
 			_mint(msg.sender, ids[i], amount[i], "");
 		}
@@ -126,11 +126,11 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	function collabbuyitem(uint256 id, uint256 amount, uint256 collabid) public {
 		IErc721 collabnfts = IErc721(collabAddresses[collabid]);
 		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
-		require(froggyfreindsnft.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
+		require(froggyFriends.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
 		require(id > 0, "id must be above 0");
 		require(price[id] > 0, "price of item not set");
 		uint256 saleamount = amount * price[id];
-		require(_erc20interface.balanceOf(msg.sender) >= saleamount, "not enough balance");
+		require(ribbit.balanceOf(msg.sender) >= saleamount, "not enough balance");
 		require(itemForSale[id] == true, "item not available for mint");
 		require(supply[id] > 0, "supply of item not set");
 		require(walletLimit[id] > 0, "walletLimit of item not set");
@@ -141,7 +141,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			holders[id].push(msg.sender);
 			track[id][msg.sender] = 1;
 		}
-		_erc20interface.transferFrom(msg.sender, address(this), saleamount);
+		ribbit.transferFrom(msg.sender, address(this), saleamount);
 		minted[id] += amount;
 		_mint(msg.sender, id, amount, "");
 	}
@@ -249,11 +249,11 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return _balances[id][account];
 	}
 
-	function checkamountsoldout(uint256 id) public view returns (uint256) {
+	function mintedSupply(uint256 id) public view returns (uint256) {
 		return minted[id];
 	}
 
-	function checksupply(uint256 id) public view returns (uint256) {
+	function itemSupply(uint256 id) public view returns (uint256) {
 		return supply[id];
 	}
 
@@ -265,13 +265,17 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		return collabAddresses[id];
 	}
 
+    function itemHolders(uint256 id) public view returns (address[] memory) {
+		return holders[id];
+	}
+
 	function setribbitandfroggynftaddress(address add, address add2) public onlyOwner {
-		_erc20interface = IErc20(add);
-		froggyfreindsnft = IErc721(add2);
+		ribbit = IErc20(add);
+		froggyFriends = IErc721(add2);
 	}
 
 	function withdrawribbit() public onlyOwner {
-		_erc20interface.transfer(msg.sender, _erc20interface.balanceOf(address(this)));
+		ribbit.transfer(msg.sender, ribbit.balanceOf(address(this)));
 	}
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
@@ -337,10 +341,6 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 				}
 			}
 		}
-	}
-
-	function checkallholdersid(uint256 id) public view returns (address[] memory) {
-		return holders[id];
 	}
 
 	/**
