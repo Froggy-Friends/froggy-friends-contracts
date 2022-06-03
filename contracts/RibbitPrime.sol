@@ -57,30 +57,26 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	string public symbol;
     string private baseUrl;
 	
-    // Mapping from item ID to price
-	mapping(uint256 => uint256) price;
-	mapping(uint256 => uint256) percent;
-	mapping(uint256 => uint256) supply;
-	mapping(uint256 => bool) boostid;
-	mapping(uint256 => uint256) minted;
-	mapping(uint256 => bool) itemForSale;
-    // Mapping from token ID to account balances
-	mapping(uint256 => mapping(address => uint256)) private _balances;
-	// Mapping from account to operator approvals
-	mapping(address => mapping(address => bool)) private _operatorApprovals;
-	
-	IErc20 _erc20interface;
-	IErc721 froggyfreindsnft;
-
-	mapping(address => bool) addresstoburn;
-	mapping(uint256 => mapping(address => uint256)) private track;
-	mapping(uint256 => address[]) holdersofid;
-
-	mapping(address => mapping(uint256 => uint256)) private mintamountperwalletcounter;
-	mapping(uint256 => uint256) mintamountperwallet;
-	mapping(uint256 => address) collabaddresses;
+	mapping(uint256 => uint256) price;      // Item ID to price
+	mapping(uint256 => uint256) percent;    // Item ID to boost percentage
+	mapping(uint256 => uint256) supply;     // Item ID to supply
+	mapping(uint256 => bool) boostid;       // Item ID to boost status (true if boost)
+	mapping(uint256 => uint256) minted;     // Item ID to minted supply
+	mapping(uint256 => bool) itemForSale;   // Item ID to sale status (true if on sale)
+	mapping(uint256 => mapping(address => uint256)) private _balances;                  // Token ID to map of address to balance
+	mapping(address => mapping(address => bool)) private _operatorApprovals;            // Address to map of address to approval status (true if approved)
+	mapping(uint256 => mapping(address => uint256)) private track;                      // Item ID to map of accounts to mint count
+	mapping(address => mapping(uint256 => uint256)) private mintamountperwalletcounter; // Address to map of item ID to mint count
+    mapping(address => bool) addresstoburn;             // Address to burn state (true if approved)
+	mapping(uint256 => uint256) mintamountperwallet;    // Item ID to mint cap per wallet
+    mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
+	mapping(uint256 => address) collabaddresses;        // Item ID to collab account
 	uint256 collabidcounter = 1;
     uint256 idCounter = 1;
+
+    // Interfaces
+    IErc20 _erc20interface;
+	IErc721 froggyfreindsnft;
 
 	constructor(string memory _name, string memory _symbol, string memory _baseUrl) {
 		name = _name;
