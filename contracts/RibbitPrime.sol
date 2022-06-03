@@ -72,7 +72,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     mapping(uint256 => address[]) holdersofid;          // Item ID to list of holder accounts
 	mapping(uint256 => address) collabaddresses;        // Item ID to collab account
 	uint256 collabidcounter = 1;
-    uint256 idCounter = 1;
+    uint256 idCounter;
 
     // Interfaces
     IErc20 _erc20interface;
@@ -151,7 +151,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
-		require(id >= idCounter, "ID already used");
+		require(id > idCounter, "ID already used");
         price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
@@ -162,7 +162,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _mintamountperwallet, address collabnftaddres) public onlyOwner {
-		require(id >= idCounter, "ID already used");
+		require(id > idCounter, "ID already used");
         price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
@@ -175,7 +175,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function listItem(uint256 id, uint256 _price, uint256 _supply, bool onSale, uint256 _mintamountperwallet) public onlyOwner {
-		require(id >= idCounter, "ID already used");
+		require(id > idCounter, "ID already used");
         price[id] = _price;
 		supply[id] = _supply;
 		itemForSale[id] = onSale;
@@ -184,7 +184,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	}
 
 	function setItemForSale(uint256 id, bool onSale) public onlyOwner {
-        require(id > 0 && id <= idCounter, "ID does not exist");
+        require(id > 0, "ID must not be zero");
+        require(id <= idCounter, "ID does not exist");
         itemForSale[id] = onSale;
 	}
 
