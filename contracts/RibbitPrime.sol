@@ -64,7 +64,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => uint256) price;                  // Item ID to price
 	mapping(uint256 => uint256) percent;                // Item ID to boost percentage
 	mapping(uint256 => uint256) supply;                 // Item ID to supply
-	mapping(uint256 => bool) boostid;                   // Item ID to boost status (true if boost)
+	mapping(uint256 => bool) boost;                   // Item ID to boost status (true if boost)
 	mapping(uint256 => uint256) minted;                 // Item ID to minted supply
 	mapping(uint256 => bool) itemForSale;               // Item ID to sale status (true if on sale)
     mapping(uint256 => uint256) walletLimit;            // Item ID to mint cap per wallet
@@ -146,23 +146,23 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		_mint(msg.sender, id, amount, "");
 	}
 
-	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool boost, bool onSale, uint256 _walletLimit) public onlyOwner {
+	function listFriend(uint256 id, uint256 percents, uint256 price_, uint256 _supply, bool _boost, bool onSale, uint256 _walletLimit) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = price_;
 		percent[id] = percents;
 		supply[id] = _supply;
-		boostid[id] = boost;
+		boost[id] = _boost;
 		itemForSale[id] = onSale;
 		walletLimit[id] = _walletLimit;
         idCounter++;
 	}
 
-	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool boost, bool onSale, uint256 _walletLimit, address collabnftaddres) public onlyOwner {
+	function listCollabFriend(uint256 id, uint256 percents, uint256 _price, uint256 _supply, bool _boost, bool onSale, uint256 _walletLimit, address collabnftaddres) public onlyOwner {
 		require(id > idCounter, "ID already listed");
         price[id] = _price;
 		percent[id] = percents;
 		supply[id] = _supply;
-		boostid[id] = boost;
+		boost[id] = _boost;
 		itemForSale[id] = onSale;
 		walletLimit[id] = _walletLimit;
 		collabAddresses[collabIdCounter] = collabnftaddres;
@@ -219,13 +219,13 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		uint256 pricing = price[id];
 		uint256 percent_ = percent[id];
 		uint256 supplyi = supply[id];
-		bool checkifboost = boostid[id];
+		bool checkifboost = boost[id];
 		return (pricing, percent_, supplyi, checkifboost);
 	}
 
     /// @dev isBoost function called by StakeFroggies.sol
 	function isBoost(uint256 id) external view returns (bool) {
-		return boostid[id];
+		return boost[id];
 	}
 
     /// @dev boostPercentage function called by StakeFroggies.sol
