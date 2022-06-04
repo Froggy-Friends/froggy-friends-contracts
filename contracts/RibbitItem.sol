@@ -70,7 +70,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     mapping(uint256 => uint256) supply; 																			// Item ID to supply
     mapping(uint256 => bool) boost; 																					// Item ID to boost status (true if boost)
     mapping(uint256 => uint256) minted; 																			// Item ID to minted supply
-    mapping(uint256 => bool) itemForSale; 																		// Item ID to sale status (true if on sale)
+    mapping(uint256 => bool) onSale; 																					// Item ID to sale status (true if on sale)
     mapping(uint256 => uint256) walletLimit; 																	// Item ID to mint cap per wallet
     mapping(uint256 => address[]) holders; 																		// Item ID to list of holder addresses
     mapping(uint256 => address) collabAddresses; 															// Item ID to collab account
@@ -113,7 +113,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
             require(price[ids[i]] > 0, "Ribbit item price not set");
             uint256 saleAmount = amount[i] * price[ids[i]];
             require(ribbit.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
-            require(itemForSale[ids[i]] == true, "Ribbit item not for sale");
+            require(onSale[ids[i]] == true, "Ribbit item not on sale");
             require(supply[ids[i]] > 0, "Ribbit item supply not set");
             require(walletLimit[ids[i]] > 0, "Ribbit item wallet limit not set");
             require(minted[ids[i]] + amount[i] <= supply[ids[i]], "Ribbit item supply exceeded");
@@ -141,7 +141,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         require(price[id] > 0, "Ribbit item price not set");
         uint256 saleAmount = amount * price[id];
         require(ribbit.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
-        require(itemForSale[id] == true, "Ribbit item not for sale");
+        require(onSale[id] == true, "Ribbit item not on sale");
         require(supply[id] > 0, "Ribbit item supply not set");
         require(walletLimit[id] > 0, "Ribbit item wallet limit not set");
         require(minted[id] + amount <= supply[id], "Ribbit item supply exceeded");
@@ -170,7 +170,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         percent[id] = _percent;
         supply[id] = _supply;
         boost[id] = _boost;
-        itemForSale[id] = _onSale;
+        onSale[id] = _onSale;
         walletLimit[id] = _walletLimit;
         idCounter++;
     }
@@ -190,7 +190,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         percent[id] = _percent;
         supply[id] = _supply;
         boost[id] = _boost;
-        itemForSale[id] = _onSale;
+        onSale[id] = _onSale;
         walletLimit[id] = _walletLimit;
         collabAddresses[collabIdCounter] = _collabAddress;
         collabIdCounter++;
@@ -207,17 +207,17 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         require(id > idCounter, "Ribbit item ID exists");
         price[id] = _price;
         supply[id] = _supply;
-        itemForSale[id] = _onSale;
+        onSale[id] = _onSale;
         walletLimit[id] = _walletLimit;
         idCounter++;
     }
 
     /// @notice sets ribbit item sale status
     /// @param id the ribbit item id
-    /// @param onSale the ribbit item sale status (true if is on sale)
-    function setItemForSale(uint256 id, bool onSale) public onlyOwner {
+    /// @param _onSale the ribbit item sale status (true if is on sale)
+    function setItemForSale(uint256 id, bool _onSale) public onlyOwner {
         require(id <= idCounter, "ID does not exist");
-        itemForSale[id] = onSale;
+        onSale[id] = _onSale;
     }
 
     /// @notice sets address burn permissions
@@ -276,9 +276,9 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         uint256 _supply = supply[id];
         bool _boost = boost[id];
         uint256 _minted = minted[id];
-        bool _forSale = itemForSale[id];
+        bool _onSale = onSale[id];
         uint256 _walletLimit = walletLimit[id];
-        return (_price, _percent, _supply, _boost, _minted, _forSale, _walletLimit);
+        return (_price, _percent, _supply, _boost, _minted, _onSale, _walletLimit);
     }
 
     /// @notice returns the ribbit item boost status (true if is boost)
@@ -297,12 +297,12 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
     /// @notice returns the ribbit item sale status (true if is on sale)
     /// @param id the ribbit item id
-    function isItemForSale(uint256 id) public view returns (bool) {
-        return itemForSale[id];
+    function isOnSale(uint256 id) public view returns (bool) {
+        return onSale[id];
     }
 
     /// @notice returns the total number of ribbit items listed
-    function totalItems() public view returns (uint256) {
+    function totalListed() public view returns (uint256) {
         return idCounter;
     }
 
@@ -322,7 +322,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
     /// @notice returns the max supply of a ribbit item
     /// @param id the ribbit item id
-    function itemSupply(uint256 id) public view returns (uint256) {
+    function maxSupply(uint256 id) public view returns (uint256) {
         return supply[id];
     }
 
