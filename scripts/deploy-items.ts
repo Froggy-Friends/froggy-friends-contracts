@@ -54,7 +54,7 @@ function getContractParams(network: string): ContractParams {
     return {
       name: "Ribbit Item",
       symbol: "RIBBIT ITEM",
-      baseUrl: "",
+      baseUrl: "https://api.froggyfriendsnft.com/items/",
       ribbitAddress: "0xAD5DE2751FFEEC0E765bF165CCCbe119D343baD3",
       froggyAddress: "0x8d2F22f14B2a3929ECb0BB2ea8054Ff944a8Ba80"
     }

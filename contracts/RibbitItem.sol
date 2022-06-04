@@ -267,32 +267,36 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         _mint(msg.sender, id, remaining, "");
     }
 
-    /// @notice returns ribbit item properties by id
-    /// @param id the ribbit item id
-    /// @return item properties
-    function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
-        uint256 _price = price[id];
-        uint256 _percent = percent[id];
-        uint256 _supply = supply[id];
-        bool _boost = boost[id];
-        uint256 _minted = minted[id];
-        bool _onSale = onSale[id];
-        uint256 _walletLimit = walletLimit[id];
-        return (_price, _percent, _supply, _boost, _minted, _onSale, _walletLimit);
-    }
-
-    /// @notice returns the ribbit item boost status (true if is boost)
-    /// @param id the ribbit item id
-    /// @dev isBoost function called by StakeFroggies.sol
-    function isBoost(uint256 id) external view returns (bool) {
-        return boost[id];
-    }
+		/// @notice returns the ribbit item price by id
+		/// @param id the ribbit item id
+		function getPrice(uint256 id) public view returns (uint256) {
+			return price[id];
+		}
 
     /// @notice returns the ribbit item boost percentage
     /// @param id the ribbit item id
     /// @dev boostPercentage function called by StakeFroggies.sol
-    function boostPercentage(uint256 id) external view returns (uint256) {
+    function boostPercentage(uint256 id) public view returns (uint256) {
         return percent[id];
+    }
+
+		/// @notice returns the max supply of a ribbit item
+    /// @param id the ribbit item id
+    function maxSupply(uint256 id) public view returns (uint256) {
+        return supply[id];
+    }
+
+		/// @notice returns the ribbit item boost status (true if is boost)
+    /// @param id the ribbit item id
+    /// @dev isBoost function called by StakeFroggies.sol
+    function isBoost(uint256 id) public view returns (bool) {
+        return boost[id];
+    }
+
+		/// @notice returns the minted supply of a ribbit item
+    /// @param id the ribbit item id
+    function mintedSupply(uint256 id) public view returns (uint256) {
+        return minted[id];
     }
 
     /// @notice returns the ribbit item sale status (true if is on sale)
@@ -301,29 +305,31 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         return onSale[id];
     }
 
-    /// @notice returns the total number of ribbit items listed
+		/// @notice returns the ribbit item wallet limit
+		/// @param id the ribbit item id
+		function getWalletLimit(uint256 id) public view returns (uint256) {
+			return walletLimit[id];
+		}
+
+		/// @notice returns ribbit item properties by id
+    /// @param id the ribbit item id
+    /// @return item properties
+    function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
+        return (
+					getPrice(id), 
+					boostPercentage(id), 
+					maxSupply(id), 
+					isBoost(id), 
+					mintedSupply(id), 
+					isOnSale(id), 
+					getWalletLimit(id)
+				);
+    }
+
+
+		/// @notice returns the total number of ribbit items listed
     function totalListed() public view returns (uint256) {
         return idCounter;
-    }
-
-    /// @notice returns the number of ribbit items an account owns
-    /// @param account the address to check the balance of
-    /// @param id the ribbit item id
-    function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
-        require(account != address(0), "ERC1155: address zero is not a valid owner");
-        return _balances[id][account];
-    }
-
-    /// @notice returns the minted supply of a ribbit item
-    /// @param id the ribbit item id
-    function mintedSupply(uint256 id) public view returns (uint256) {
-        return minted[id];
-    }
-
-    /// @notice returns the max supply of a ribbit item
-    /// @param id the ribbit item id
-    function maxSupply(uint256 id) public view returns (uint256) {
-        return supply[id];
     }
 
     /// @notice returns the number of collab friends listed
@@ -335,6 +341,14 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     /// @param id the ribbit item id
     function collabAddress(uint256 id) public view returns (address) {
         return collabAddresses[id];
+    }
+
+		/// @notice returns the number of ribbit items an account owns
+    /// @param account the address to check the balance of
+    /// @param id the ribbit item id
+    function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
+        require(account != address(0), "ERC1155: address zero is not a valid owner");
+        return _balances[id][account];
     }
 
     /// @notice returns ribbit item holders
