@@ -59,6 +59,10 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     string private baseUrl;
     uint256 collabIdCounter = 1;
     uint256 idCounter;
+
+    // Interfaces
+    IErc20 ribbit;
+	IErc721 froggyFriends;
 	
     // Maps
 	mapping(uint256 => uint256) price;                  // Item ID to price
@@ -68,17 +72,13 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 	mapping(uint256 => uint256) minted;                 // Item ID to minted supply
 	mapping(uint256 => bool) itemForSale;               // Item ID to sale status (true if on sale)
     mapping(uint256 => uint256) walletLimit;            // Item ID to mint cap per wallet
-    mapping(uint256 => address[]) holders;              // Item ID to list of holder accounts
+    mapping(uint256 => address[]) holders;              // Item ID to list of holder addresses
 	mapping(uint256 => address) collabAddresses;        // Item ID to collab account
     mapping(address => bool) approvedBurnAddress;       // Address to burn state (true if approved)
 	mapping(uint256 => mapping(address => uint256)) private _balances;          // Token ID to map of address to balance
 	mapping(address => mapping(address => bool)) private _operatorApprovals;    // Address to map of address to approval status (true if approved)
-	mapping(uint256 => mapping(address => uint256)) private track;              // Item ID to map of accounts to mint count
+	mapping(uint256 => mapping(address => uint256)) private track;              // Item ID to map of address to mint count
 	mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;   // Address to map of item ID to mint count
-
-    // Interfaces
-    IErc20 ribbit;
-	IErc721 froggyFriends;
 
 	constructor(string memory _name, string memory _symbol, string memory _baseUrl, address _ribbitAddress, address _froggyAddress) {
 		name = _name;
@@ -106,7 +106,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @notice Bundle buy Ribbit Items
     /// @param ids list of ribbit item ids to buy
     /// @param amount list of ribbit item amounts
-	function bundlebuyitem(uint256[] memory ids, uint256[] memory amount) public {
+	function bundleBuy(uint256[] memory ids, uint256[] memory amount) public {
 		require(ids.length == amount.length, "Ribbit item ID missing");
 		for (uint256 i; i < ids.length; i++) {
 			require(ids[i] > 0, "Ribbit item ID must not be zero");
@@ -116,8 +116,8 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 			require(itemForSale[ids[i]] == true, "Ribbit item not for sale");
 			require(supply[ids[i]] > 0, "Ribbit item supply not set");
 			require(walletLimit[ids[i]] > 0, "Ribbit item wallet limit not set");
-			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "already minted above supply");
-			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= walletLimit[ids[i]], "Ribbit item wallet limit reached");
+			require(minted[ids[i]] + amount[i] <= supply[ids[i]], "Ribbit item supply exceeded");
+			require(mintLimitCounter[msg.sender][ids[i]] + amount[i] <= walletLimit[ids[i]], "Ribbit item wallet limit exceeded");
 			mintLimitCounter[msg.sender][ids[i]] += amount[i];
 			if (track[ids[i]][msg.sender] < 1) {
 				holders[ids[i]].push(msg.sender);
@@ -133,25 +133,25 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @param id the ribbit item id
     /// @param amount the amount of the ribbit item
     /// @param collabId the collab id of the ribbit item
-	function collabbuyitem(uint256 id, uint256 amount, uint256 collabId) public {
-		IErc721 collabnfts = IErc721(collabAddresses[collabId]);
-		require(collabnfts.balanceOf(msg.sender) > 0, "you dont have a collabnft");
-		require(froggyFriends.balanceOf(msg.sender) > 0, "you dont have a froggfriends");
-		require(id > 0, "id must be above 0");
-		require(price[id] > 0, "price of item not set");
-		uint256 saleamount = amount * price[id];
-		require(ribbit.balanceOf(msg.sender) >= saleamount, "not enough balance");
-		require(itemForSale[id] == true, "item not available for mint");
-		require(supply[id] > 0, "supply of item not set");
-		require(walletLimit[id] > 0, "walletLimit of item not set");
-		require(minted[id] + amount <= supply[id], "already minted above supply");
-		require(mintLimitCounter[msg.sender][id] + amount <= walletLimit[id], "cant mint above mint amount per wallet");
+	function collabBuy(uint256 id, uint256 amount, uint256 collabId) public {
+		IErc721 collabNFT = IErc721(collabAddresses[collabId]);
+		require(collabNFT.balanceOf(msg.sender) > 0, "Collab nft not owned");
+		require(froggyFriends.balanceOf(msg.sender) > 0, "Froggy friend not owned");
+		require(id > 0, "Ribbit item ID must not be zero");
+		require(price[id] > 0, "Ribbit item price not set");
+		uint256 saleAmount = amount * price[id];
+		require(ribbit.balanceOf(msg.sender) >= saleAmount, "Insufficient funds for purchase");
+		require(itemForSale[id] == true, "Ribbit item not for sale");
+		require(supply[id] > 0, "Ribbit item supply not set");
+		require(walletLimit[id] > 0, "Ribbit item wallet limit not set");
+		require(minted[id] + amount <= supply[id], "Ribbit item supply exceeded");
+		require(mintLimitCounter[msg.sender][id] + amount <= walletLimit[id], "Ribbit item wallet limit exceeded");
 		mintLimitCounter[msg.sender][id] += amount;
 		if (track[id][msg.sender] < 1) {
 			holders[id].push(msg.sender);
 			track[id][msg.sender] = 1;
 		}
-		ribbit.transferFrom(msg.sender, address(this), saleamount);
+		ribbit.transferFrom(msg.sender, address(this), saleAmount);
 		minted[id] += amount;
 		_mint(msg.sender, id, amount, "");
 	}
@@ -165,7 +165,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @param _onSale the friend sale status (true if is on sale)
     /// @param _walletLimit the friend wallet limit
 	function listFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit) public onlyOwner {
-		require(id > idCounter, "ID already listed");
+		require(id > idCounter, "Ribbit item ID exists");
         price[id] = _price;
 		percent[id] = _percent;
 		supply[id] = _supply;
@@ -185,7 +185,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @param _walletLimit the collab friend wallet limit
     /// @param _collabAddress the collab NFT address
 	function listCollabFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit, address _collabAddress) public onlyOwner {
-		require(id > idCounter, "ID already listed");
+		require(id > idCounter, "Ribbit item ID exists");
         price[id] = _price;
 		percent[id] = _percent;
 		supply[id] = _supply;
@@ -204,7 +204,7 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
     /// @param _onSale the ribbit item sale status (true if is on sale)
     /// @param _walletLimit the ribbit item wallet limit
 	function listItem(uint256 id, uint256 _price, uint256 _supply, bool _onSale, uint256 _walletLimit) public onlyOwner {
-		require(id > idCounter, "ID already listed");
+		require(id > idCounter, "Ribbit item ID exists");
         price[id] = _price;
 		supply[id] = _supply;
 		itemForSale[id] = _onSale;
@@ -274,9 +274,9 @@ contract RibbitPrime is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable 
 		uint256 _price = price[id];
 		uint256 _percent = percent[id];
 		uint256 _supply = supply[id];
-		bool _boost = boost[id];
+		bool    _boost = boost[id];
         uint256 _minted = minted[id];
-        bool _forSale = itemForSale[id];
+        bool    _forSale = itemForSale[id];
         uint256 _walletLimit = walletLimit[id];
 		return (_price, _percent, _supply, _boost, _minted, _forSale, _walletLimit);
 	}
