@@ -88,19 +88,19 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         froggyFriends = IErc721(_froggyAddress);
 
         // Ribbit Items
-        listItem(1, 200000 * 10**18, 5, true, 1); 				// Golden Lily Pad
-        listFriend(2, 5, 	700 * 10**18, 200, true, true, 1);  // Rabbit Friend
-        listFriend(3, 10, 1800 * 10**18, 150, true, true, 1);   // Bear Friend
-        listFriend(4, 15, 5000 * 10**18, 75, true, true, 1);    // Red Panda Friend
-        listFriend(5, 20, 10000 * 10**18, 10, true, true, 1);   // Cat Friend
-        listFriend(6, 30, 100000 * 10**18, 5, true, true, 1);   // Unicorn Friend
-        listFriend(7, 30, 300000 * 10**18, 1, true, true, 1);   // Golden Tiger Friend
+        listItem(1,       200000 * 10**18, 6, true, 1); 		 // Golden Lily Pad
+        listFriend(2, 5, 	 700 * 10**18, 200, true, true, 1);  // Rabbit Friend
+        listFriend(3, 10,   1800 * 10**18, 150, true, true, 1);  // Bear Friend
+        listFriend(4, 15,   5000 * 10**18, 75, true, true, 1);   // Red Panda Friend
+        listFriend(5, 20,  10000 * 10**18, 10, true, true, 1);   // Cat Friend
+        listFriend(6, 30, 100000 * 10**18, 6, true, true, 1);    // Unicorn Friend
+        listFriend(7, 30, 300000 * 10**18, 1, true, true, 1);    // Golden Tiger Friend
 
         listCollabFriend(8, 10, 	700 * 10**18, 5, true, true, 1, 0xba033D82c64DD514B184e2d1405cD395dfE6e706); // Bao Society Friend
         listCollabFriend(9, 10, 	700 * 10**18, 5, true, true, 1, 0x928f072C009727FbAd81bBF3aAa885f9fEa65fcf); // Roo Troop Friend
         listCollabFriend(10, 5, 	700 * 10**18, 5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570); // Squishiverse Friend
         listCollabFriend(11, 5, 	700 * 10**18, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7); // CryptoMories Friend
-        listCollabFriend(12, 10, 1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83);   // Kaiju Kings Friend
+        listCollabFriend(12, 10,   1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
 
 		listItem(13, 500 * 10**18, 10, true, 1); // froggy friend raffle
 		listItem(14, 500 * 10**18, 10, true, 1); // froggy friend raffle
@@ -109,6 +109,10 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 		listItem(16, 500 * 10**18, 1, true, 1); // froggy friend nft
         listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
         listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
+
+        // Reserve golden lily pad and unicorn for froggy milestones raffle
+        _mint(owner(), 1, 1, "");
+        _mint(owner(), 6, 1, "");
     }
 
     /// @notice Bundle buy Ribbit Items
@@ -220,12 +224,56 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         idCounter++;
     }
 
+    /// @notice sets the ribbit item price
+    /// @param id the ribbit item id
+    function setPrice(uint256 id, uint256 _price) public onlyOwner {
+        require(id <= idCounter, "ID does not exist");
+        price[id] = _price;
+    }
+
+    /// @notice sets the ribbit item percent
+    /// @param id the ribbit item id
+    function setPercent(uint256 id, uint256 _percent) public onlyOwner {
+        require(id <= idCounter, "ID does not exist");
+        percent[id] = _percent;
+    }
+
+    /// @notice sets the ribbit item boost status (true if is boost)
+    /// @param id the ribbit item id
+    function setIsBoost(uint256 id, bool _isBoost) public onlyOwner {
+        require(id <= idCounter, "ID does not exist");
+        boost[id] = _isBoost;
+    }
+
+    /// @notice sets the ribbit item supply
+    /// @param id the ribbit item id
+    function setSupply(uint256 id, uint256 _supply) public onlyOwner {
+        require(id <= idCounter, "ID does not exist");
+        supply[id] = _supply;
+    }
+
     /// @notice sets ribbit item sale status
     /// @param id the ribbit item id
     /// @param _onSale the ribbit item sale status (true if is on sale)
-    function setItemForSale(uint256 id, bool _onSale) public onlyOwner {
+    function setOnSale(uint256 id, bool _onSale) public onlyOwner {
         require(id <= idCounter, "ID does not exist");
         onSale[id] = _onSale;
+    }
+
+    /// @notice sets ribbit item wallet limit
+    /// @param id the ribbit item id
+    /// @param _walletLimit the new wallet limit
+    function setWalletLimit(uint256 id, uint256 _walletLimit) public onlyOwner {
+        require(id <= idCounter, "ID does not exist");
+        walletLimit[id] = _walletLimit;
+    }
+
+    /// @notice sets collab friend address
+    /// @param collabId the collab friend ribbit item id
+    /// @param _collabAddress the new collab friend address
+    function setCollabAddress(uint256 collabId, address _collabAddress) public onlyOwner {
+        require(collabId <= collabIdCounter, "ID does not exist");
+        collabAddresses[collabId] = _collabAddress;
     }
 
     /// @notice sets address burn permissions
@@ -275,11 +323,11 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         _mint(msg.sender, id, remaining, "");
     }
 
-		/// @notice returns the ribbit item price by id
-		/// @param id the ribbit item id
-		function getPrice(uint256 id) public view returns (uint256) {
-			return price[id];
-		}
+    /// @notice returns the ribbit item price by id
+    /// @param id the ribbit item id
+    function getPrice(uint256 id) public view returns (uint256) {
+        return price[id];
+    }
 
     /// @notice returns the ribbit item boost percentage
     /// @param id the ribbit item id
@@ -288,20 +336,20 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         return percent[id];
     }
 
-		/// @notice returns the max supply of a ribbit item
+	/// @notice returns the max supply of a ribbit item
     /// @param id the ribbit item id
     function maxSupply(uint256 id) public view returns (uint256) {
         return supply[id];
     }
 
-		/// @notice returns the ribbit item boost status (true if is boost)
+	/// @notice returns the ribbit item boost status (true if is boost)
     /// @param id the ribbit item id
     /// @dev isBoost function called by StakeFroggies.sol
     function isBoost(uint256 id) public view returns (bool) {
         return boost[id];
     }
 
-		/// @notice returns the minted supply of a ribbit item
+	/// @notice returns the minted supply of a ribbit item
     /// @param id the ribbit item id
     function mintedSupply(uint256 id) public view returns (uint256) {
         return minted[id];
@@ -313,29 +361,29 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         return onSale[id];
     }
 
-		/// @notice returns the ribbit item wallet limit
-		/// @param id the ribbit item id
-		function getWalletLimit(uint256 id) public view returns (uint256) {
-			return walletLimit[id];
-		}
+    /// @notice returns the ribbit item wallet limit
+    /// @param id the ribbit item id
+    function getWalletLimit(uint256 id) public view returns (uint256) {
+        return walletLimit[id];
+    }
 
-		/// @notice returns ribbit item properties by id
+	/// @notice returns ribbit item properties by id
     /// @param id the ribbit item id
     /// @return item properties
     function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
         return (
-					getPrice(id), 
-					boostPercentage(id), 
-					maxSupply(id), 
-					isBoost(id), 
-					mintedSupply(id), 
-					isOnSale(id), 
-					getWalletLimit(id)
-				);
+            getPrice(id), 
+            boostPercentage(id), 
+            maxSupply(id), 
+            isBoost(id), 
+            mintedSupply(id), 
+            isOnSale(id), 
+            getWalletLimit(id)
+        );
     }
 
 
-		/// @notice returns the total number of ribbit items listed
+	/// @notice returns the total number of ribbit items listed
     function totalListed() public view returns (uint256) {
         return idCounter;
     }
@@ -351,7 +399,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         return collabAddresses[id];
     }
 
-		/// @notice returns the number of ribbit items an account owns
+	/// @notice returns the number of ribbit items an account owns
     /// @param account the address to check the balance of
     /// @param id the ribbit item id
     function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
