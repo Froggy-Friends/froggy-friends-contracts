@@ -44,11 +44,11 @@ async function main() {
 function getContractParams(network: string): ContractParams {
   if (network === 'mainnet') {
     return {
-      name: "",
-      symbol: "",
-      baseUrl: "",
-      ribbitAddress: "",
-      froggyAddress: ""
+      name: "Ribbit Item",
+      symbol: "RIBBIT ITEM",
+      baseUrl: "https://api.froggyfriendsnft.com/items/",
+      ribbitAddress: "0x46898f15F99b8887D87669ab19d633F579939ad9",
+      froggyAddress: "0x8F7b5f7845224349ae9Ae45B400EBAE0051fCD9d"
     }
   } else {
     return {
