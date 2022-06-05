@@ -57,6 +57,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     string public name;
     string public symbol;
     string private baseUrl;
+    string private contractUrl;
     uint256 collabIdCounter = 1;
     uint256 idCounter;
 
@@ -80,10 +81,11 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     mapping(uint256 => mapping(address => uint256)) private track; 				// Item ID to map of address to mint count
     mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;	// Address to map of item ID to mint count
 
-    constructor(string memory _name, string memory _symbol, string memory _baseUrl, address _ribbitAddress, address _froggyAddress) {
+    constructor(string memory _name, string memory _symbol, string memory _baseUrl, string memory _contractUrl, address _ribbitAddress, address _froggyAddress) {
         name = _name;
         symbol = _symbol;
         baseUrl = _baseUrl;
+        contractUrl = _contractUrl;
         ribbit = IErc20(_ribbitAddress);
         froggyFriends = IErc721(_froggyAddress);
 
@@ -428,6 +430,19 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     /// @notice withdraws ribbit balance from this contract to the admin account
     function withdrawRibbit() public onlyOwner {
         ribbit.transfer(msg.sender, ribbit.balanceOf(address(this)));
+    }
+
+    /// @notice returns the contract metdata url
+    /// @dev i.e.(https://api.froggyfriendsnft.com/items/{_contractUrl})
+    function contractURI() public view returns (string memory) {
+        return string(abi.encodePacked(baseUrl, contractUrl));
+    }
+
+    /// @notice sets contract metdata uri
+    /// @param _contractUrl the new contract uri path 
+    /// @dev i.e. contract/metadata (https://api.froggyfriendsnft.com/items/{_contractUrl})
+    function setContractURI(string memory _contractUrl) public onlyOwner {
+        contractUrl = _contractUrl;
     }
 
     /// @dev uri fills the base url with the supplied item id

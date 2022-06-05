@@ -4,6 +4,7 @@ interface ContractParams {
   name: string;
   symbol: string;
   baseUrl: string;
+  contractUrl: string;
   ribbitAddress: string;
   froggyAddress: string;
 }
@@ -47,6 +48,7 @@ function getContractParams(network: string): ContractParams {
       name: "Ribbit Item",
       symbol: "RIBBIT ITEM",
       baseUrl: "https://api.froggyfriendsnft.com/items/",
+      contractUrl: "contract/metadata",
       ribbitAddress: "0x46898f15F99b8887D87669ab19d633F579939ad9",
       froggyAddress: "0x8F7b5f7845224349ae9Ae45B400EBAE0051fCD9d"
     }
@@ -55,6 +57,7 @@ function getContractParams(network: string): ContractParams {
       name: "Ribbit Item",
       symbol: "RIBBIT ITEM",
       baseUrl: "https://api.froggyfriendsnft.com/items/",
+      contractUrl: "contract/metadata",
       ribbitAddress: "0xAD5DE2751FFEEC0E765bF165CCCbe119D343baD3",
       froggyAddress: "0x8d2F22f14B2a3929ECb0BB2ea8054Ff944a8Ba80"
     }
