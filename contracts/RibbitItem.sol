@@ -112,8 +112,12 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
         listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
 
-        // Reserve golden lily pad and unicorn for froggy milestones raffle
+        // Reserve for froggy milestones raffles
         _mint(owner(), 1, 1, "");
+        _mint(owner(), 2, 1, "");
+        _mint(owner(), 3, 1, "");
+        _mint(owner(), 4, 1, "");
+        _mint(owner(), 5, 1, "");
         _mint(owner(), 6, 1, "");
     }
 

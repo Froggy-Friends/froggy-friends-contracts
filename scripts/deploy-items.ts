@@ -21,8 +21,8 @@ async function main() {
     const [owner] = await ethers.getSigners();
     console.log("\nDeployment Owner: ", owner.address);
 
-    const { name, symbol, baseUrl, ribbitAddress, froggyAddress } = getContractParams(network.name);
-    const contract = (await factory.deploy(name, symbol, baseUrl, ribbitAddress, froggyAddress));
+    const { name, symbol, baseUrl, contractUrl, ribbitAddress, froggyAddress } = getContractParams(network.name);
+    const contract = (await factory.deploy(name, symbol, baseUrl, contractUrl, ribbitAddress, froggyAddress));
     console.log("\nContract Address: ", contract.address);
     
     await contract.deployed();
@@ -37,7 +37,7 @@ async function main() {
     await run("verify:verify", 
         { 
             address: contract.address,
-            constructorArguments: [name, symbol, baseUrl, ribbitAddress, froggyAddress]
+            constructorArguments: [name, symbol, baseUrl, contractUrl, ribbitAddress, froggyAddress]
         }
     );
 }
