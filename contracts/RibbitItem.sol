@@ -29,7 +29,7 @@
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
@@ -101,6 +101,14 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         listCollabFriend(10, 5, 	700 * 10**18, 5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570); // Squishiverse Friend
         listCollabFriend(11, 5, 	700 * 10**18, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7); // CryptoMories Friend
         listCollabFriend(12, 10, 1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
+
+				listItem(13, 500 * 10**18, 10, true, 1); // froggy friend raffle
+				listItem(14, 500 * 10**18, 10, true, 1); // froggy friend raffle
+				listItem(15, 500 * 10**18, 10, true, 1); // froggy friend raffle
+
+				listItem(16, 500 * 10**18, 1, true, 1); // froggy friend nft
+				listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
+				listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
     }
 
     /// @notice Bundle buy Ribbit Items
