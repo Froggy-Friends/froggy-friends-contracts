@@ -65,19 +65,19 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     IErc721 froggyFriends;
 
     // Maps
-    mapping(uint256 => uint256) price; 																				// Item ID to price
-    mapping(uint256 => uint256) percent; 																			// Item ID to boost percentage
-    mapping(uint256 => uint256) supply; 																			// Item ID to supply
-    mapping(uint256 => bool) boost; 																					// Item ID to boost status (true if boost)
-    mapping(uint256 => uint256) minted; 																			// Item ID to minted supply
-    mapping(uint256 => bool) onSale; 																					// Item ID to sale status (true if on sale)
-    mapping(uint256 => uint256) walletLimit; 																	// Item ID to mint cap per wallet
-    mapping(uint256 => address[]) holders; 																		// Item ID to list of holder addresses
-    mapping(uint256 => address) collabAddresses; 															// Item ID to collab account
-    mapping(address => bool) approvedBurnAddress; 														// Address to burn state (true if approved)
-    mapping(uint256 => mapping(address => uint256)) private _balances; 				// Token ID to map of address to balance
-    mapping(address => mapping(address => bool)) private _operatorApprovals; 	// Address to map of address to approval status (true if approved)
-    mapping(uint256 => mapping(address => uint256)) private track; 						// Item ID to map of address to mint count
+    mapping(uint256 => uint256) price; 											// Item ID to price
+    mapping(uint256 => uint256) percent; 										// Item ID to boost percentage
+    mapping(uint256 => uint256) supply; 										// Item ID to supply
+    mapping(uint256 => bool) boost; 											// Item ID to boost status (true if boost)
+    mapping(uint256 => uint256) minted; 										// Item ID to minted supply
+    mapping(uint256 => bool) onSale; 											// Item ID to sale status (true if on sale)
+    mapping(uint256 => uint256) walletLimit; 									// Item ID to mint cap per wallet
+    mapping(uint256 => address[]) holders; 										// Item ID to list of holder addresses
+    mapping(uint256 => address) collabAddresses; 								// Item ID to collab account
+    mapping(address => bool) approvedBurnAddress; 								// Address to burn state (true if approved)
+    mapping(uint256 => mapping(address => uint256)) private _balances; 			// Token ID to map of address to balance
+    mapping(address => mapping(address => bool)) private _operatorApprovals;    // Address to map of address to approval status (true if approved)
+    mapping(uint256 => mapping(address => uint256)) private track; 				// Item ID to map of address to mint count
     mapping(address => mapping(uint256 => uint256)) private mintLimitCounter;	// Address to map of item ID to mint count
 
     constructor(string memory _name, string memory _symbol, string memory _baseUrl, address _ribbitAddress, address _froggyAddress) {
@@ -88,27 +88,27 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         froggyFriends = IErc721(_froggyAddress);
 
         // Ribbit Items
-        listItem(1, 200000 * 10**18, 5, true, 1); 						// Golden Lily Pad
-        listFriend(2, 5, 	700 * 10**18, 200, true, true, 1); 	// Rabbit Friend
-        listFriend(3, 10, 1800 * 10**18, 150, true, true, 1); // Bear Friend
-        listFriend(4, 15, 5000 * 10**18, 75, true, true, 1);	// Red Panda Friend
-        listFriend(5, 20, 10000 * 10**18, 10, true, true, 1); // Cat Friend
-        listFriend(6, 30, 100000 * 10**18, 5, true, true, 1); // Unicorn Friend
-        listFriend(7, 30, 300000 * 10**18, 1, true, true, 1); // Golden Tiger Friend
+        listItem(1, 200000 * 10**18, 5, true, 1); 				// Golden Lily Pad
+        listFriend(2, 5, 	700 * 10**18, 200, true, true, 1);  // Rabbit Friend
+        listFriend(3, 10, 1800 * 10**18, 150, true, true, 1);   // Bear Friend
+        listFriend(4, 15, 5000 * 10**18, 75, true, true, 1);    // Red Panda Friend
+        listFriend(5, 20, 10000 * 10**18, 10, true, true, 1);   // Cat Friend
+        listFriend(6, 30, 100000 * 10**18, 5, true, true, 1);   // Unicorn Friend
+        listFriend(7, 30, 300000 * 10**18, 1, true, true, 1);   // Golden Tiger Friend
 
         listCollabFriend(8, 10, 	700 * 10**18, 5, true, true, 1, 0xba033D82c64DD514B184e2d1405cD395dfE6e706); // Bao Society Friend
         listCollabFriend(9, 10, 	700 * 10**18, 5, true, true, 1, 0x928f072C009727FbAd81bBF3aAa885f9fEa65fcf); // Roo Troop Friend
         listCollabFriend(10, 5, 	700 * 10**18, 5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570); // Squishiverse Friend
         listCollabFriend(11, 5, 	700 * 10**18, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7); // CryptoMories Friend
-        listCollabFriend(12, 10, 1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
+        listCollabFriend(12, 10, 1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83);   // Kaiju Kings Friend
 
-				listItem(13, 500 * 10**18, 10, true, 1); // froggy friend raffle
-				listItem(14, 500 * 10**18, 10, true, 1); // froggy friend raffle
-				listItem(15, 500 * 10**18, 10, true, 1); // froggy friend raffle
+		listItem(13, 500 * 10**18, 10, true, 1); // froggy friend raffle
+		listItem(14, 500 * 10**18, 10, true, 1); // froggy friend raffle
+		listItem(15, 500 * 10**18, 10, true, 1); // froggy friend raffle
 
-				listItem(16, 500 * 10**18, 1, true, 1); // froggy friend nft
-				listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
-				listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
+		listItem(16, 500 * 10**18, 1, true, 1); // froggy friend nft
+        listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
+        listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
     }
 
     /// @notice Bundle buy Ribbit Items
