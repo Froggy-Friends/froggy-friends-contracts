@@ -113,12 +113,12 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
 
         // Reserve for froggy milestones raffles
-        _mint(owner(), 1, 1, "");
-        _mint(owner(), 2, 1, "");
-        _mint(owner(), 3, 1, "");
-        _mint(owner(), 4, 1, "");
-        _mint(owner(), 5, 1, "");
-        _mint(owner(), 6, 1, "");
+        adminMint(owner(), 1, 1);
+        adminMint(owner(), 2, 1);
+        adminMint(owner(), 3, 1);
+        adminMint(owner(), 4, 1);
+        adminMint(owner(), 5, 1);
+        adminMint(owner(), 6, 1);
     }
 
     /// @notice Bundle buy Ribbit Items
@@ -376,15 +376,15 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 	/// @notice returns ribbit item properties by id
     /// @param id the ribbit item id
     /// @return item properties
-    function item(uint256 id) public view returns (uint256, uint256, uint256, bool, uint256, bool, uint256) {
+    function item(uint256 id) public view returns (uint256, uint256, uint256, uint256, uint256, bool, bool) {
         return (
             getPrice(id), 
             boostPercentage(id), 
-            maxSupply(id), 
+            mintedSupply(id),
+            maxSupply(id),
+            getWalletLimit(id),
             isBoost(id), 
-            mintedSupply(id), 
-            isOnSale(id), 
-            getWalletLimit(id)
+            isOnSale(id)
         );
     }
 
