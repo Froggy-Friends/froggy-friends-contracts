@@ -91,10 +91,10 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
         // Ribbit Items
         listItem(1,       200000 * 10**18, 6, true, 1); 		 // Golden Lily Pad
-        listFriend(2, 5, 	 700 * 10**18, 200, true, true, 1);  // Rabbit Friend
-        listFriend(3, 10,   1800 * 10**18, 150, true, true, 1);  // Bear Friend
-        listFriend(4, 15,   5000 * 10**18, 75, true, true, 1);   // Red Panda Friend
-        listFriend(5, 20,  10000 * 10**18, 10, true, true, 1);   // Cat Friend
+        listFriend(2, 5, 	 700 * 10**18, 201, true, true, 1);  // Rabbit Friend
+        listFriend(3, 10,   1800 * 10**18, 151, true, true, 1);  // Bear Friend
+        listFriend(4, 15,   5000 * 10**18, 76, true, true, 1);   // Red Panda Friend
+        listFriend(5, 20,  10000 * 10**18, 11, true, true, 1);   // Cat Friend
         listFriend(6, 30, 100000 * 10**18, 6, true, true, 1);    // Unicorn Friend
         listFriend(7, 35, 300000 * 10**18, 1, true, true, 1);    // Golden Tiger Friend
 
