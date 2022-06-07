@@ -58,6 +58,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     string public symbol;
     string private baseUrl;
     string private contractUrl;
+    uint256 decimals = 10**18;
     uint256 collabIdCounter = 1;
     uint256 idCounter;
 
@@ -90,35 +91,38 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         froggyFriends = IErc721(_froggyAddress);
 
         // Ribbit Items
-        listItem(1,       200000 * 10**18, 6, true, 1); 		 // Golden Lily Pad
-        listFriend(2, 5, 	 700 * 10**18, 201, true, true, 1);  // Rabbit Friend
-        listFriend(3, 10,   1800 * 10**18, 151, true, true, 1);  // Bear Friend
-        listFriend(4, 15,   5000 * 10**18, 76, true, true, 1);   // Red Panda Friend
-        listFriend(5, 20,  10000 * 10**18, 11, true, true, 1);   // Cat Friend
-        listFriend(6, 30, 100000 * 10**18, 6, true, true, 1);    // Unicorn Friend
-        listFriend(7, 35, 300000 * 10**18, 1, true, true, 1);    // Golden Tiger Friend
+        listItem(1, 200000, 6, true, 1);             // Golden Lily Pad
+        listFriend(2, 5, 700, 201, true, true, 1);   // Rabbit Friend
+        listFriend(3, 10, 1800, 151, true, true, 1); // Bear Friend
+        listFriend(4, 15, 5000, 76, true, true, 1);  // Red Panda Friend
+        listFriend(5, 20, 10000, 11, true, true, 1); // Cat Friend
+        listFriend(6, 30, 100000, 6, true, true, 1); // Unicorn Friend
+        listFriend(7, 35, 300000, 1, true, true, 1); // Golden Tiger Friend
 
-        listCollabFriend(8, 10, 	700 * 10**18, 5, true, true, 1, 0xba033D82c64DD514B184e2d1405cD395dfE6e706); // Bao Society Friend
-        listCollabFriend(9, 10, 	700 * 10**18, 5, true, true, 1, 0x928f072C009727FbAd81bBF3aAa885f9fEa65fcf); // Roo Troop Friend
-        listCollabFriend(10, 5, 	700 * 10**18, 5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570); // Squishiverse Friend
-        listCollabFriend(11, 5, 	700 * 10**18, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7); // CryptoMories Friend
-        listCollabFriend(12, 10,   1000 * 10**18, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
+        listCollabFriend(8, 10, 700, 5, true, true, 1, 0xba033D82c64DD514B184e2d1405cD395dfE6e706);   // Bao Society Friend
+        listCollabFriend(9, 10, 700, 5, true, true, 1, 0x928f072C009727FbAd81bBF3aAa885f9fEa65fcf);   // Roo Troop Friend
+        listCollabFriend(10, 5, 700, 5, true, true, 1, 0x67421C8622F8E38Fe9868b4636b8dC855347d570);   // Squishiverse Friend
+        listCollabFriend(11, 5, 700, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7);   // CryptoMories Friend
+        listCollabFriend(12, 10, 1000, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
 
-		listItem(13, 500 * 10**18, 10, true, 1); // froggy friend raffle
-		listItem(14, 500 * 10**18, 10, true, 1); // froggy friend raffle
-		listItem(15, 500 * 10**18, 10, true, 1); // froggy friend raffle
+        listItem(13, 50000, 10, true, 1);  // froggy friends shirt
 
-		listItem(16, 500 * 10**18, 1, true, 1); // froggy friend nft
-        listItem(17, 500 * 10**18, 1, true, 1); // froggy friend nft
-        listItem(18, 500 * 10**18, 1, true, 1); // froggy friend nft
+		listItem(14,  1000, 1, true, 1);   // froggy friend #2917
+        listItem(15,  1000, 1, true, 1);   // froggy friend #2598
+        listItem(16,  5000, 1, true, 1);   // froggy friend #7
+        listItem(17, 50000, 1, true, 1);   // froggy friend #28
 
-        // Reserve for froggy milestones raffles
-        adminMint(owner(), 1, 1);
-        adminMint(owner(), 2, 1);
-        adminMint(owner(), 3, 1);
-        adminMint(owner(), 4, 1);
-        adminMint(owner(), 5, 1);
-        adminMint(owner(), 6, 1);
+        listItem(18, 200, 10, true, 1);   // froggy friend raffle #1
+		listItem(19, 200, 10, true, 1);   // froggy friend raffle #2
+		listItem(20, 200, 10, true, 1);   // froggy friend raffle #3
+
+        // Froggy Milestones raffle reserved Ribbit Items
+        adminMint(owner(), 1, 1); // Golden Lily Pad
+        adminMint(owner(), 2, 1); // Rabbit Friend
+        adminMint(owner(), 3, 1); // Bear Friend
+        adminMint(owner(), 4, 1); // Red Panda Friend
+        adminMint(owner(), 5, 1); // Cat Friend
+        adminMint(owner(), 6, 1); // Unicorn Friend
     }
 
     /// @notice Bundle buy Ribbit Items
@@ -177,14 +181,14 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     /// @notice list friend ribbit item
     /// @param id the ribbit item id
     /// @param _percent the friend boost percentage
-    /// @param _price the friend price
+    /// @param _price the friend price in ether format
     /// @param _supply the friend supply
     /// @param _boost the friend boost status (true if is a boost)
     /// @param _onSale the friend sale status (true if is on sale)
     /// @param _walletLimit the friend wallet limit
     function listFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit) public onlyOwner {
         require(id > idCounter, "Ribbit item ID exists");
-        price[id] = _price;
+        price[id] = _price * decimals;
         percent[id] = _percent;
         supply[id] = _supply;
         boost[id] = _boost;
@@ -196,7 +200,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     /// @notice list collab friend item
     /// @param id the ribbit item id
     /// @param _percent the collab friend boost percentage
-    /// @param _price the collab friend price
+    /// @param _price the collab friend price in ether format
     /// @param _supply the collab friend supply
     /// @param _boost the collab friend boost status (true if is a boost)
     /// @param _onSale the collab friend sale status (true if is on sale)
@@ -204,7 +208,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
     /// @param _collabAddress the collab NFT address
     function listCollabFriend(uint256 id, uint256 _percent, uint256 _price, uint256 _supply, bool _boost, bool _onSale, uint256 _walletLimit, address _collabAddress) public onlyOwner {
         require(id > idCounter, "Ribbit item ID exists");
-        price[id] = _price;
+        price[id] = _price * decimals;
         percent[id] = _percent;
         supply[id] = _supply;
         boost[id] = _boost;
@@ -217,13 +221,13 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
     /// @notice list ribbit item
     /// @param id the ribbit item id
-    /// @param _price the ribbit item price
+    /// @param _price the ribbit item price in ether format
     /// @param _supply the ribbit item supply
     /// @param _onSale the ribbit item sale status (true if is on sale)
     /// @param _walletLimit the ribbit item wallet limit
     function listItem(uint256 id, uint256 _price, uint256 _supply, bool _onSale, uint256 _walletLimit) public onlyOwner {
         require(id > idCounter, "Ribbit item ID exists");
-        price[id] = _price;
+        price[id] = _price * decimals;
         supply[id] = _supply;
         onSale[id] = _onSale;
         walletLimit[id] = _walletLimit;
@@ -232,9 +236,10 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
     /// @notice sets the ribbit item price
     /// @param id the ribbit item id
+    /// @param _price the ribbit item price in ether format
     function setPrice(uint256 id, uint256 _price) public onlyOwner {
         require(id <= idCounter, "ID does not exist");
-        price[id] = _price;
+        price[id] = _price * decimals;
     }
 
     /// @notice sets the ribbit item percent
@@ -329,7 +334,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         _mint(msg.sender, id, remaining, "");
     }
 
-    /// @notice returns the ribbit item price by id
+    /// @notice returns the ribbit item price by id in gwei format
     /// @param id the ribbit item id
     function getPrice(uint256 id) public view returns (uint256) {
         return price[id];
