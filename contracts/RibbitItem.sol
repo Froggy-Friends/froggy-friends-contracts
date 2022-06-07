@@ -401,7 +401,7 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
 
     /// @notice returns the number of collab friends listed
     function totalCollabs() public view returns (uint256) {
-        return collabIdCounter;
+        return collabIdCounter-1;
     }
 
     /// @notice returns the collab address of a collab friend
