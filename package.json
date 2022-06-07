@@ -9,6 +9,7 @@
     "deploy-ribbit": "npx hardhat run scripts/deploy-ribbit.ts --network rinkeby",
     "deploy-staking": "npx hardhat run scripts/deploy-staking.ts --network rinkeby",
     "deploy-items": "npx hardhat run scripts/deploy-items.ts --network rinkeby",
+    "deploy-collab": "npx hardhat run scripts/deploy-collab.ts --network rinkeby",
     "rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
     "prod": "npx hardhat run scripts/deploy.ts --network mainnet",
     "node": "npx hardhat node",
