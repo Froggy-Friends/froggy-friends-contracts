@@ -105,20 +105,6 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         listCollabFriend(11, 5, 700, 5, true, true, 1, 0x1a2F71468F656E97c2F86541E57189F59951efe7);   // CryptoMories Friend
         listCollabFriend(12, 10, 1000, 2, true, true, 1, 0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83); // Kaiju Kings Friend
 
-        listItem(13, 50000, 10, true, 1);  // froggy friends shirt
-
-		listItem(14,  1000, 1, true, 1);   // froggy friend #2917
-        listItem(15,  1000, 1, true, 1);   // froggy friend #2598
-        listItem(16,  5000, 1, true, 1);   // froggy friend #7
-        listItem(17, 50000, 1, true, 1);   // froggy friend #28
-
-        listItem(18, 200, 10, true, 1);    // froggy friend raffle #1
-		listItem(19, 200, 10, true, 1);    // froggy friend raffle #2
-		listItem(20, 200, 10, true, 1);    // froggy friend raffle #3
-
-        listItem(21, 1000, 15, true, 1);   // Allowlist
-        listItem(22, 5000, 40, true, 1);   // Allowlist
-
         // Froggy Milestones raffle reserved Ribbit Items
         adminMint(owner(), 1, 1); // Golden Lily Pad
         adminMint(owner(), 2, 1); // Rabbit Friend
