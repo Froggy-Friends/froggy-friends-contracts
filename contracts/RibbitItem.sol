@@ -112,11 +112,12 @@ contract RibbitItem is Context, ERC165, IERC1155, IERC1155MetadataURI, Ownable {
         listItem(16,  5000, 1, true, 1);   // froggy friend #7
         listItem(17, 50000, 1, true, 1);   // froggy friend #28
 
-        listItem(18, 200, 10, true, 1);   // froggy friend raffle #1
-		listItem(19, 200, 10, true, 1);   // froggy friend raffle #2
-		listItem(20, 200, 10, true, 1);   // froggy friend raffle #3
+        listItem(18, 200, 10, true, 1);    // froggy friend raffle #1
+		listItem(19, 200, 10, true, 1);    // froggy friend raffle #2
+		listItem(20, 200, 10, true, 1);    // froggy friend raffle #3
 
-        listItem(21, 1000, 15, true, 1);   // KikiVerse Allowlist
+        listItem(21, 1000, 15, true, 1);   // Allowlist
+        listItem(22, 5000, 40, true, 1);   // Allowlist
 
         // Froggy Milestones raffle reserved Ribbit Items
         adminMint(owner(), 1, 1); // Golden Lily Pad
