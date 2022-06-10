@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage --network coverage",
+    "deploy-collabland": "npx hardhat run scripts/deploy-collabland.ts --network mainnet",
     "deploy-ribbit": "npx hardhat run scripts/deploy-ribbit.ts --network rinkeby",
     "deploy-staking": "npx hardhat run scripts/deploy-staking.ts --network rinkeby",
     "deploy-items": "npx hardhat run scripts/deploy-items.ts --network rinkeby",
