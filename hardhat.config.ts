@@ -21,7 +21,7 @@ const config: HardhatUserConfig = {
         },
       },
     },
-    defaultNetwork: "rinkeby",
+    defaultNetwork: "goerli",
     networks: {
       hardhat: {
         chainId: 1337
@@ -30,7 +30,7 @@ const config: HardhatUserConfig = {
         url: ALCHEMY_API_URL,
         accounts: [`0x${PRIVATE_KEY}`],
       },
-      rinkeby: {
+      goerli: {
         url: ALCHEMY_API_URL_STG,
         accounts: [`0x${PRIVATE_KEY}`],
       },

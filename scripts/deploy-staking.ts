@@ -44,7 +44,7 @@ function getContractParams(network: string): ContractParams {
       }
   } else {
       return {
-          froggyAddress: "0xF47E8A340672Dacb10Da0f677632a694a96E9CD0"
+          froggyAddress: "0xE5413Ccf0D90c0fA594bABa2a858cb93675da2Ee"
       }
   }
 }
