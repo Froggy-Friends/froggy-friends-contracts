@@ -6,6 +6,8 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { FriendPairing } from './../types/FriendPairing';
 import { ethers } from "hardhat";
 import { expect } from 'chai';
+import keccak256 from 'keccak256';
+import MerkleTree from 'merkletreejs';
 
 function generateStakingTiers(rarityBand: any): string[] {
   let rarityAmount: string[] = [];
@@ -42,6 +44,8 @@ describe("Friend Pairing", async () => {
   let owner: SignerWithAddress;
   let acc2: SignerWithAddress;
   let acc3: SignerWithAddress;
+  let tree: MerkleTree;
+  let root;
   let rarityAmount;
   let rarityBand;
 
@@ -54,6 +58,9 @@ describe("Friend Pairing", async () => {
       "epic": [11, 12]
     }
     rarityAmount = generateStakingTiers(rarityBand);
+    const leaves = rarityAmount.map(x => keccak256(x));
+    tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+    root = '0x'+tree.getRoot().toString('hex');
 
     [owner, acc2, acc3] = await ethers.getSigners();
     let frogFactory = await ethers.getContractFactory("FroggyFriends");
@@ -84,10 +91,6 @@ describe("Friend Pairing", async () => {
     await friendPairing.deployed();
   });
 
-  beforeEach(() => {
-    
-  });
-
   it("Creates contract addresses", () => {
     expect(froggyFriends.address);
     expect(ribbit.address);
@@ -95,7 +98,5 @@ describe("Friend Pairing", async () => {
     expect(ribbitItems.address);
     expect(friendPairing.address);
   });
-
-
   
 });
