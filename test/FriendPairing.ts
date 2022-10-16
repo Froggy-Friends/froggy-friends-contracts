@@ -1,9 +1,11 @@
+import { Ribbit } from './../types/Ribbit';
 import { RibbitItem } from './../types/RibbitItem';
 import { FroggyFriends } from './../types/FroggyFriends';
 import { StakeFroggies } from './../types/StakeFroggies';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { FriendPairing } from './../types/FriendPairing';
 import { ethers } from "hardhat";
+import { expect } from 'chai';
 
 function generateStakingTiers(rarityBand: any): string[] {
   let rarityAmount: string[] = [];
@@ -34,14 +36,16 @@ function generateStakingTiers(rarityBand: any): string[] {
 describe("Friend Pairing", async () => {
   let friendPairing: FriendPairing;
   let stakeFroggies: StakeFroggies;
+  let ribbit: Ribbit;
   let ribbitItems: RibbitItem;
   let froggyFriends: FroggyFriends;
   let owner: SignerWithAddress;
   let acc2: SignerWithAddress;
+  let acc3: SignerWithAddress;
   let rarityAmount;
   let rarityBand;
 
-  before(() => {
+  before(async() => {
     rarityBand = {
       "common": [3, 4],
       "uncommon": [5, 6],
@@ -50,22 +54,48 @@ describe("Friend Pairing", async () => {
       "epic": [11, 12]
     }
     rarityAmount = generateStakingTiers(rarityBand);
-  })
 
-  beforeEach(async() => {
-    [owner, acc2] = await ethers.getSigners();
+    [owner, acc2, acc3] = await ethers.getSigners();
     let frogFactory = await ethers.getContractFactory("FroggyFriends");
     let stakingFactory = await ethers.getContractFactory("StakeFroggies");
+    let ribbitFactory = await ethers.getContractFactory("Ribbit");
     let ribbitItemFactory = await ethers.getContractFactory("RibbitItem");
     let pairingFactory = await ethers.getContractFactory("FriendPairing");
+
+    // deploy frogs
     froggyFriends = (await frogFactory.deploy()) as FroggyFriends;
-    stakeFroggies = (await stakingFactory.deploy()) as StakeFroggies;
-    ribbitItems = (await ribbitItemFactory.deploy()) as RibbitItem;
-    friendPairing = (await pairingFactory.deploy()) as FriendPairing;
     await froggyFriends.deployed();
+
+    // deploy ribbit token
+    ribbit = (await ribbitFactory.deploy("Ribbit", "Ribit")) as Ribbit;
+    await ribbit.deployed();
+
+    // deploy staking froggies
+    stakeFroggies = (await stakingFactory.deploy(froggyFriends.address)) as StakeFroggies;
     await stakeFroggies.deployed();
+    await stakeFroggies.setRibbitAddress(ribbit.address);
+    await ribbit.setApprovedContractAddress(stakeFroggies.address);
+
+    // deploy ribbit items
+    ribbitItems = (await ribbitItemFactory.deploy("RibbitItems", "RibbitItems", "", "", ribbit.address, froggyFriends.address)) as RibbitItem;
     await ribbitItems.deployed();
+
+    friendPairing = (await pairingFactory.deploy(stakeFroggies.address)) as FriendPairing;
     await friendPairing.deployed();
-  })
+  });
+
+  beforeEach(() => {
+    
+  });
+
+  it("Creates contract addresses", () => {
+    expect(froggyFriends.address);
+    expect(ribbit.address);
+    expect(stakeFroggies.address);
+    expect(ribbitItems.address);
+    expect(friendPairing.address);
+  });
+
+
   
 });
