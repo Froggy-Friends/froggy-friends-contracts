@@ -16,7 +16,7 @@
     "node": "npx hardhat node",
     "rarity": "npx hardhat run scripts/rarity.ts",
     "test": "npx hardhat test --network hardhat",
-    "test-staking": "npx hardhat test test/staking.js --network hardhat",
+    "test-pairing": "npx hardhat test test/StakeFroggies.ts --network hardhat",
     "snapshot": "npx hardhat run scripts/snapshot.ts --network mainnet",
     "owner-snapshot": "npx hardhat run scripts/ownerTokens.ts --network mainnet"
   },
