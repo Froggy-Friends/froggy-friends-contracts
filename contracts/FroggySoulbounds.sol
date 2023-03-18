@@ -36,9 +36,9 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 error SoulboundBlock();
 error ClaimOff();
-error NotMinter();
-error NotHolder();
+error NotEligible();
 error Claimed();
+error InvalidProof();
 
 contract FroggySoulbounds is ERC1155, Ownable {
   using Strings for uint256;
@@ -47,39 +47,40 @@ contract FroggySoulbounds is ERC1155, Ownable {
   string private _name = "Froggy Soulbounds";
   string private _symbol = "FROGGYSBT";
   bool public claimOn = true;
-  bytes32 public minterRoot = 0x70d4f525facbf965995cb1114c24a84aeef6abc2de6c64557f5b0a1c80f5b376;
-  bytes32 public holderRoot = 0x11c5642add578cbc941ac7f630f769c41aa5c02b055c6a01bc53a508fa1bff69;
+  mapping(uint256 => bytes32) public roots;
 
-  constructor() ERC1155("") {}
+  constructor() ERC1155("") {
+    roots[1] = 0x70d4f525facbf965995cb1114c24a84aeef6abc2de6c64557f5b0a1c80f5b376; // one year anniversary minters
+    roots[2] = 0x11c5642add578cbc941ac7f630f769c41aa5c02b055c6a01bc53a508fa1bff69; // one year anniversary holders
+  }
 
-  function airdropFroggySoulbounds(uint256 id, address[] calldata accounts) external onlyOwner {
+  function airdrop(uint256 id, address[] calldata accounts) external onlyOwner {
     for (uint i = 0; i < accounts.length; i++) {
       _mint(accounts[i], id, 1, "");
     }
   }
 
-  function claimMinterSoulbound(bytes32[] memory proof) public {
+  function claim(bytes32[] memory proof, uint256 id) public {
+    _claim(proof, id);
+  }
+
+  function claimMany(bytes32[][] memory proofs, uint256[] calldata ids) public {
+    if (proofs.length != ids.length) revert InvalidProof();
+    for (uint i = 0; i < ids.length; i++) {
+      _claim(proofs[i], ids[i]);
+    }
+  }
+
+  function _claim(bytes32[] memory proof, uint256 id) internal {
     if (claimOn == false) revert ClaimOff();
-    if (isMinter(proof, msg.sender) == false) revert NotMinter();
-    if (balanceOf(msg.sender, 1) > 0) revert Claimed();
-    _mint(msg.sender, 1, 1, "");
+    if (isEligible(proof, id, msg.sender) == false) revert NotEligible();
+    if (balanceOf(msg.sender, id) > 0) revert Claimed();
+    _mint(msg.sender, id, 1, "");
   }
 
-  function claimHolderSoulbound(bytes32[] memory proof) public {
-    if (claimOn == false) revert ClaimOff();
-    if (isHolder(proof, msg.sender) == false) revert NotHolder();
-    if (balanceOf(msg.sender, 2) > 0) revert Claimed();
-    _mint(msg.sender, 2, 1, "");
-  }
-
-  function isMinter(bytes32[] memory proof, address account) public view returns(bool) {
+  function isEligible(bytes32[] memory proof, uint256 id, address account) public view returns(bool) {
     bytes32 leaf= keccak256(abi.encodePacked(account));
-    return MerkleProof.verify(proof, minterRoot, leaf);
-  }
-
-  function isHolder(bytes32[] memory proof, address account) public view returns(bool) {
-    bytes32 leaf= keccak256(abi.encodePacked(account));
-    return MerkleProof.verify(proof, holderRoot, leaf);
+    return MerkleProof.verify(proof, roots[id], leaf);
   }
 
   function adminBurn(address account, uint256 id) external onlyOwner {
@@ -118,15 +119,15 @@ contract FroggySoulbounds is ERC1155, Ownable {
     claimOn = _claimOn;
   }
 
-  function setMinterRoot(bytes32 _root) public onlyOwner {
-    minterRoot = _root;
+  function setRoot(uint256 id, bytes32 _root) public onlyOwner {
+    roots[id] = _root;
   }
 
-  function setHolderRoot(bytes32 _root) public onlyOwner {
-    holderRoot = _root;
+  function getRoot(uint256 id) public view virtual returns (bytes32) {
+    return roots[id];
   }
 
-  // Soulbound Token overrides
+  // Disable approvals and transfers
   function setApprovalForAll(address, bool) public pure override {
     revert SoulboundBlock();
   }
