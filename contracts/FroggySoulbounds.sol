@@ -53,7 +53,7 @@ contract FroggySoulbounds is ERC1155, Ownable {
   constructor() ERC1155("") {
     _name = "Froggy Soulbounds";
     _symbol = "FROGGYSBT";
-    baseUrl = "https://froggyfriends.mypinata.cloud/ipfs/QmZkeyC7mePjGnKm7wRL9fLZBYgw5fN6vtUcaF2uDwNue1/";
+    baseUrl = "https://froggyfriends.mypinata.cloud/ipfs/QmcYcdwiRTED2gw4SyLuKoM7Ts7L5ukyiEARbMBo3Sgyux/";
     contractUrl = "https://froggyfriends.mypinata.cloud/ipfs/QmPiga7eAYUvXarkh1PPJ869mNrEKXo9AFqw4eGYkEcVc9";
     baseUrlSuffix = ".json";
     roots[1] = 0x70d4f525facbf965995cb1114c24a84aeef6abc2de6c64557f5b0a1c80f5b376; // one year anniversary minters
