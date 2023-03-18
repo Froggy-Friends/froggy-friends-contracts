@@ -42,14 +42,20 @@ error InvalidProof();
 
 contract FroggySoulbounds is ERC1155, Ownable {
   using Strings for uint256;
-  string private baseUrl = "";
-  string private contractUrl = "";
-  string private _name = "Froggy Soulbounds";
-  string private _symbol = "FROGGYSBT";
+  string private baseUrl;
+  string private baseUrlSuffix;
+  string private contractUrl;
+  string private _name;
+  string private _symbol;
   bool public claimOn = true;
   mapping(uint256 => bytes32) public roots;
 
   constructor() ERC1155("") {
+    _name = "Froggy Soulbounds";
+    _symbol = "FROGGYSBT";
+    baseUrl = "https://froggyfriends.mypinata.cloud/ipfs/QmZkeyC7mePjGnKm7wRL9fLZBYgw5fN6vtUcaF2uDwNue1";
+    contractUrl = "https://froggyfriends.mypinata.cloud/ipfs/QmPiga7eAYUvXarkh1PPJ869mNrEKXo9AFqw4eGYkEcVc9";
+    baseUrlSuffix = ".json";
     roots[1] = 0x70d4f525facbf965995cb1114c24a84aeef6abc2de6c64557f5b0a1c80f5b376; // one year anniversary minters
     roots[2] = 0x11c5642add578cbc941ac7f630f769c41aa5c02b055c6a01bc53a508fa1bff69; // one year anniversary holders
   }
@@ -108,11 +114,15 @@ contract FroggySoulbounds is ERC1155, Ownable {
   }
 
   function uri(uint256 tokenId) public view virtual override returns (string memory) {
-    return string(abi.encodePacked(baseUrl, tokenId.toString()));
+    return string(abi.encodePacked(baseUrl, tokenId.toString(), baseUrlSuffix));
   }
 
   function setURI(string memory _baseUrl) public onlyOwner {
     baseUrl = _baseUrl;
+  }
+
+  function setSuffix(string memory _suffix) public onlyOwner {
+    baseUrlSuffix = _suffix;
   }
 
   function setClaim(bool _claimOn) public onlyOwner {

@@ -1,0 +1,13 @@
+{
+  "name": "Froggy Minter",
+  "description": "Official Froggy Friends soulbound tokens collection.",
+  "image": "https://froggyfriends.mypinata.cloud/ipfs/QmUnFZPJbvDxiJPaKtTpZXZxiieT4jTeyTNzGzhRfdqU8u",
+  "animation_url": "https://froggyfriends.mypinata.cloud/ipfs/QmT6dxcHYoiFiHZc33jwqK87RVEHitJXHRjrKHxvi676Vn",
+  "external_url": "https://froggyfriendsnft.com",
+  "attributes": [
+    {
+      "trait_type": "Category",
+      "value": "Minter"
+    }
+  ]
+}
