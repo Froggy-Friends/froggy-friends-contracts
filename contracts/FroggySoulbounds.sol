@@ -47,8 +47,8 @@ contract FroggySoulbounds is ERC1155, Ownable {
   string private _name = "Froggy Soulbounds";
   string private _symbol = "FROGGYSBT";
   bool public claimOn = true;
-  bytes32 public minterRoot;
-  bytes32 public holderRoot;
+  bytes32 public minterRoot = 0x70d4f525facbf965995cb1114c24a84aeef6abc2de6c64557f5b0a1c80f5b376;
+  bytes32 public holderRoot = 0x11c5642add578cbc941ac7f630f769c41aa5c02b055c6a01bc53a508fa1bff69;
 
   constructor() ERC1155("") {}
 
