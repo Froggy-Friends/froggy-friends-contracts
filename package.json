@@ -44,7 +44,8 @@
     "@alch/alchemy-web3": "^1.1.4",
     "@openzeppelin/contracts": "^4.3.1",
     "keccak256": "^1.0.6",
-    "merkletreejs": "^0.2.30"
+    "merkletreejs": "^0.2.30",
+    "operator-filter-registry": "^1.4.1"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.3",
@@ -56,6 +57,7 @@
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
+    "erc721a": "^4.2.3",
     "ethereum-waffle": "^3.4.0",
     "ethers": "^5.5.2",
     "hardhat": "^2.19.5",
