@@ -12,45 +12,46 @@ import "solidity-coverage";
 const { ALCHEMY_API_URL_STG, ALCHEMY_API_URL, PRIVATE_KEY, ETHERSCAN_API_KEY, COINMARKETCAP_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
-   solidity: {
-      version: "0.8.14",
-      settings: {
-        optimizer: {
-          enabled: true,
-          runs: 800,
-        },
+  solidity: {
+    version: "0.8.24",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
       },
+      evmVersion: "paris"
     },
-    defaultNetwork: "goerli",
-    networks: {
-      hardhat: {
-        chainId: 1337
-      },
-      mainnet: {
-        url: ALCHEMY_API_URL,
-        accounts: [`0x${PRIVATE_KEY}`],
-      },
-      goerli: {
-        url: ALCHEMY_API_URL_STG,
-        accounts: [`0x${PRIVATE_KEY}`],
-      },
-      coverage: {
-        url: "http://127.0.0.1:8555"
-      }
+  },
+  defaultNetwork: "mainnet",
+  networks: {
+    hardhat: {
+      chainId: 1337
     },
-    etherscan: {
-      apiKey: ETHERSCAN_API_KEY,
+    mainnet: {
+      url: ALCHEMY_API_URL,
+      accounts: [`0x${PRIVATE_KEY}`],
     },
-    gasReporter: {
-      currency: 'USD',
-      enabled: true,
-      coinmarketcap: COINMARKETCAP_API_KEY,
-      gasPrice: 50
+    goerli: {
+      url: ALCHEMY_API_URL_STG,
+      accounts: [`0x${PRIVATE_KEY}`],
     },
-    typechain: {
-      outDir: "types",
-      target: "ethers-v5"
+    coverage: {
+      url: "http://127.0.0.1:8555"
     }
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
+  },
+  gasReporter: {
+    currency: 'USD',
+    enabled: true,
+    coinmarketcap: COINMARKETCAP_API_KEY,
+    gasPrice: 50
+  },
+  typechain: {
+    outDir: "types",
+    target: "ethers-v5"
+  }
 }
 
 export default config;

@@ -51,6 +51,7 @@ function getContractParams(network: string): ContractParams {
       contractUrl: "contract/metadata",
       ribbitAddress: "0x46898f15F99b8887D87669ab19d633F579939ad9",
       froggyAddress: "0x8F7b5f7845224349ae9Ae45B400EBAE0051fCD9d" // use staking address for collabBuy verification
+      // Feb 25, 2023 set froggy address to be 0x29652C2e9D3656434Bc8133c69258C8d05290f41 on the ribbit items contract
     }
   } else {
     return {
