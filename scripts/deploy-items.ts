@@ -57,10 +57,10 @@ function getContractParams(network: string): ContractParams {
     return {
       name: "Ribbit Item",
       symbol: "RIBBIT ITEM",
-      baseUrl: "https://api.froggyfriendsnft.com/items/",
+      baseUrl: "https://api.froggyfriends.io/items/",
       contractUrl: "contract/metadata",
       ribbitAddress: "0xF47E8A340672Dacb10Da0f677632a694a96E9CD0",
-      froggyAddress: "0xE5413Ccf0D90c0fA594bABa2a858cb93675da2Ee" // use staking address for collabBuy verification
+      froggyAddress: "0x586bd2155BDb9E9270439656D2d520A54e6b9448" // use staking address for collabBuy verification
     }
   }
 }
